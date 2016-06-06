@@ -1,0 +1,12 @@
+[package]
+name = "hello-world"
+version = "0.1.0"
+authors = ["John Doe <john.doe@email.com>",
+           "Jane Doe <jane.doe@email.com>"]
+publish = false
+description = "This is just a demo."
+license = "MIT/Apache-2.0"
+keywords = ["demo", "test"]
+homepage = "https://github.com/john.doe/hello-world"
+repository = "https://github.com/john.doe/hello-world"
+documentation = "https://github.com/john.doe/hello-world"

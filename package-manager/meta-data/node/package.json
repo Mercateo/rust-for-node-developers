@@ -1,0 +1,25 @@
+{
+  "name": "hello-world",
+  "version": "0.1.0",
+  "author": "John Doe <john.doe@email.com> (https://github.com/john.doe)",
+  "contributors": [
+    "Jane Doe <jane.doe@email.com> (https://github.com/jane.doe)"
+  ],
+  "private": true,
+  "description": "This is just a demo.",
+  "license": "(MIT OR Apache-2.0)",
+  "keywords": [
+    "demo",
+    "test"
+  ],
+  "homepage": "https://github.com/john.doe/hello-world",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/john.doe/hello-world"
+  },
+  "bugs": "https://github.com/john.doe/hello-world/issues",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src"
+  }
+}

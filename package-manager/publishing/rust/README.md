@@ -1,0 +1,1 @@
+The source code for this example lives in a dedicated repository: [rust-hello-world](https://github.com/donaldpipowitch/rust-hello-world).
