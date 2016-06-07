@@ -150,15 +150,15 @@ This becomes more interesting if you want to lock down  dependencies (and depend
 
 ## Publishing
 
-Before we actually learn how to install and use a dependency we will actually publish a package we can require afterwards. It will just export a `Hello world!` string. I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but I think it'll simplify some comparisons between Node and Rust in the future when I use types or modern ES2015 features like modules.
+Before we actually learn how to install and use a dependency we will actually publish a package we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for "Rust for Node developers). npm offers namespacing of modules called [_scoped packages._](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is actually [intended](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
 
-Let us begin with the Node example. For this one we need to install TypeScript as a `devDependency`:
+I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but I think it'll simplify some comparisons between Node and Rust in the future when I use types or modern ES2015 features like modules. First we need to install TypeScript as a `devDependency`:
 
 ```bash
-$ npm i --save-dev typescript
+$ npm install --save-dev typescript
 ```
 
-To build the project we need to call the TypeScript compiler (`tsc`) as a new `build` entry in the `scripts` object of the `package.json`. We also add a `prepublish` entry which _allways_ runs the build process before publishing our module:
+To build the project we need to call the TypeScript compiler (`tsc`) as a new `build` entry in the `scripts` object of the `package.json`. We also add a `prepublish` entry which _always_ runs the build process before publishing our module:
 
 ```json
 {
@@ -293,4 +293,144 @@ Now that we published two packages we can try to require them in other projects 
 
 ## Dependencies
 
-TODO...
+Let us start with Node again to show you how using dependencies work. To be honest... we already used a dependency, right? TypeScript. We added it to the `devDependencies` and use it in every example now:
+
+```bash
+$ npm install --save-dev typescript
+```
+
+`devDependencies` are only needed when we develop our Node application, but not at runtime. We use our recently published package as a real `dependency`. Install it like this:
+
+```bash
+$ npm install --save rfnd-hello-world
+```
+
+You should see the following dependencies in your `package.json`:
+
+```json
+{
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "rfnd-hello-world": "^1.0.0"
+  }
+}
+```
+
+We should also change our `start` script so it behaves similar to `$ cargo run` - build the project and run it:
+
+```json
+{
+  "scripts": {
+    "start": "npm run build && node dist"
+  }
+}
+```
+
+The final `package.json` looks pretty much like our previous example, just with less meta data. I'll show it to you, so we are on the same page:
+
+```json
+{
+  "name": "use-hello-world",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "npm run build && node dist",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "rfnd-hello-world": "^1.0.0"
+  }
+}
+```
+
+The `tsconfig.json` is just copy and pasted without modifications.
+
+We installed our dependencies, now we can use them like this:
+
+```typescript
+import { HELLO_WORLD } from 'rfnd-hello-world';
+
+console.log(`Required "${HELLO_WORLD}".`);
+```
+
+If you already use some ES2015 syntax before you shouldn't see any surprises. Let's run it:
+
+```bash
+$ npm start
+
+> use-hello-world@ start /Users/donaldpipowitch/Workspace/rust-for-node-developers/package-manager/dependencies/node
+> npm run build && node dist
+
+
+> use-hello-world@ build /Users/donaldpipowitch/Workspace/rust-for-node-developers/package-manager/dependencies/node
+> tsc
+
+Required "Hello world!".
+```
+
+Good. Now we switch to Rust. As I said in our [setup](../setup/README.md) `$ cargo install` actually installs only _globally_ and only crates which should be used as a command line tool. Think about the times you installed something like `$ npm install -g gulp-cli`. If `gulp` would exist in Cargo we would install it pretty much this way: `$ cargo install gulp`.
+
+However the crate we created earlier isn't a command line tool, but a library. We can't add it to our project via the command line. At least not with `cargo install` - in the future Cargo will probably support a [`cargo add`](https://github.com/rust-lang/cargo/issues/4#issuecomment-187241132) to do so. Currently we need to add it to our `Cargo.toml` manually in a section called `[dependencies]`. It looks like this:
+
+```bash
+[dependencies]
+rfnd-hello-world = "1.0.0"
+```
+
+The crate will be _automatically_ fetched as soon as we compile our program. Note that using `1.0.0` actually translates to `^1.0.0`! If you want a very specific version you should use `=1.0.0`.
+
+This is how our `src/main.rs` looks like:
+
+```rust
+extern crate rfnd_hello_world;
+
+use rfnd_hello_world::HELLO_WORLD;
+
+fn main() {
+    println!("Required \"{}\".", HELLO_WORLD);
+}
+```
+Note that even though our external crate is called `rfnd-hello-world` we access it with `rfnd_hello_world`.
+
+As we use `HELLO_WORLD` just a single time we could also have written the example like this:
+
+```rust
+extern crate rfnd_hello_world;
+
+fn main() {
+    println!("Required \"{}\".", rfnd_hello_world::HELLO_WORLD);
+}
+```
+
+If `rfnd_hello_world` would expose more than one constant we can use a syntax similar to ES2015 destructing.
+
+
+```rust
+extern crate rfnd_hello_world;
+
+use rfnd_hello_world::{HELLO_WORLD, FOO};
+
+fn main() {
+    println!("Required \"{}\".", HELLO_WORLD);
+    println!("Also \"{}\".", FOO);
+}
+```
+
+Nice. Now test your programm:
+
+```bash
+$ cargo run
+    Updating registry `https://github.com/rust-lang/crates.io-index`
+   Compiling use-hello-world v0.1.0 (file:///Users/donaldpipowitch/Workspace/rust-for-node-developers/package-manager/dependencies/rust)
+     Running `target/debug/use-hello-world`
+Required "Hello world!".
+```
+
+It works! :tada:

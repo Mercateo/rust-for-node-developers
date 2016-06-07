@@ -1,0 +1,17 @@
+{
+  "name": "use-hello-world",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "npm run build && node dist",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  },
+  "dependencies": {
+    "rfnd-hello-world": "^1.0.0"
+  }
+}

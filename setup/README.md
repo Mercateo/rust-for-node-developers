@@ -152,11 +152,13 @@ On the following site you can choose between stable and insider releases. The in
 
 Now we will install [Rusty Code](https://github.com/saviorisdead/RustyCode) the Rust extension for VS Code. Just open VS Code, press `⌘P` (Quick Open) and type `ext install RustyCode`. Click on _Rusty Code_.
 
-After that we need to install [Racer](https://github.com/phildawes/racer). This is used by Rusty Code to get code completion for Rust. You can install Racer easily with Rusts package manager called Cargo, which was installed alongside with Rust. I'll introduce you to Cargo in more detail in a later chapter. For now you can install Racer with the following command. It will be installed _globally_ by default (- if you used `rustup` to install Rust it should be installed to `~/.cargo`):
+After that we need to install [Racer](https://github.com/phildawes/racer). This is used by Rusty Code to get code completion for Rust. You can install Racer easily with Rusts package manager called Cargo, which was installed alongside with Rust. I'll introduce you to Cargo in more detail in the chapter about [package manager](../package-manager/README.md). For now you can install Racer with the following command:
 
 ```bash
 $ cargo install racer
 ```
+
+Unlike npm the `install` command always installs packages _globally_ (e.g. to `~/.cargo`, if you used `rustup`) and only packages which are used as a command line tool.
 
 You also need [rustfmt](https://github.com/rust-lang-nursery/rustfmt) so Rusty Code can format your Rust code. We'll use Cargo for this, too:
 
