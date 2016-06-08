@@ -29,7 +29,7 @@ How do we move on from here? First I'll guide you how my current setup looks lik
 # Table of contents
 
 0. [Setup](setup)
-0. [Hello World](hello-world/README.md)
-0. [Package Manager](package-manager/README.md)
+0. [Hello World](hello-world)
+0. [Package Manager](package-manager)
 
 Thank you for reading this article. ♥

@@ -41,3 +41,7 @@ Hello world!
 ```
 
 Now you'll see `Hello world!` in your console. This shows a fundamental difference between JavaScript/Node and Rust. Rust needs to be compiled before our program can be executed. This extra step is not needed for JavaScript which makes the development cycle with JavaScript sometimes faster. However the compilation step catches a ton of bugs _before_ even executing your program. This can be _so_ useful that you probably often want to introduce something similar to JavaScript - like TypeScript. There is another big benefit: we can easily share our compiled `hello-world` program with other developers _without_ the need for them to have Rust installed. This is not possible with Node scripts. Everyone who wants to run our `hello-world.js` needs to have Node installed.
+
+______
+
+← [prev](../setup) | [next](../package-manager) →

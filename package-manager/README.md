@@ -7,7 +7,7 @@ Node and Rust both come with a package manager. Nodes package manager is called 
 ![official npm website](./npm-site.png)
 ![official Cargo website](./cargo-site.png)
 
-If you followed my [Setup](../setup/README.md) and you use Node v4.4.5 you should update the bundled npm version, because it is relatively old by now. Node v4.4.5 comes with npm v2.15.5, but the current stable version is v3.9.5 at the time of writing this and v3 and v2 differ in a lot of ways. To update npm you just call this:
+If you followed my [Setup](../setup) and you use Node v4.4.5 you should update the bundled npm version, because it is relatively old by now. Node v4.4.5 comes with npm v2.15.5, but the current stable version is v3.9.5 at the time of writing this and v3 and v2 differ in a lot of ways. To update npm you just call this:
 
 ```bash
 $ npm install -g npm
@@ -150,7 +150,7 @@ This becomes more interesting if you want to lock down  dependencies (and depend
 
 ## Publishing
 
-Before we actually learn how to install and use a dependency we will actually publish a package we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for "Rust for Node developers). npm offers namespacing of modules called [_scoped packages._](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is actually [intended](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
+Before we learn how to install and use a dependency we will actually publish a package that we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for _"Rust for Node developers"_). npm offers namespacing of modules called [_scoped packages_](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is an [intended limitation](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
 
 I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but I think it'll simplify some comparisons between Node and Rust in the future when I use types or modern ES2015 features like modules. First we need to install TypeScript as a `devDependency`:
 
@@ -263,7 +263,7 @@ As you can see this line of code in Rust is really similar to our TypeScript cod
 export const HELLO_WORLD: string = 'Hello world!';
 ```
 
-`pub` makes our `const` _public_ (much like `export` in JavaScript). Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here or we'll get compiler errors. (Rust also supports type infering, but it looks like `const` always requires an [explicit type annotation](http://rustbyexample.com/custom_types/constants.html). Maybe this [could change in the future](https://users.rust-lang.org/t/when-i-export-a-str-as-const-why-do-i-need-to-set-its-type-and-lifetime/6112/2) for cases like this one.) [As noted earlier](../hello-world/README.md) `"Hello world!"` is called a _string literal_. Its type is `&str` (spoken as _string slice_). Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples.
+`pub` makes our `const` _public_ (much like `export` in JavaScript). Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here or we'll get compiler errors. (Rust also supports type infering, but it looks like `const` always requires an [explicit type annotation](http://rustbyexample.com/custom_types/constants.html). Maybe this [could change in the future](https://users.rust-lang.org/t/when-i-export-a-str-as-const-why-do-i-need-to-set-its-type-and-lifetime/6112/2) for cases like this one.) [As noted earlier](../hello-world) `"Hello world!"` is called a _string literal_. Its type is `&str` (spoken as _string slice_). Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples.
 
 But what is the meaning behind `'static`? This is a so called [_lifetime_](https://doc.rust-lang.org/book/lifetimes.html) - a concept which is very unique to Rust and one of its big advantages. But because it is so unique and new it is probably also the biggest hurdle while learning Rust. Together with the concept of [_borrowing_](https://doc.rust-lang.org/book/references-and-borrowing.html) it forms a feature called [_ownership_](https://doc.rust-lang.org/book/ownership.html). Ownership is Rusts way to guarantee memory safety without introducing a garbage collector. This is done at compile time, not runtime and the part in the compiler which does this check is called _borrow checker_. A lifetime tells the compiler how long a resource _lives_. That means how long this resource is available in memory. For now I like to thing about lifetimes as _meta data_ associated to a variable or constant very much like a type (e.g. `&str`). Thanks to type infering we don't need to add types for every variable and the same is true for lifetimes. Sometimes we need to tell the compiler a lifetime and sometimes not. This is probably not a fully satisfying answer and you have questions, but we'll explore _ownership_, _lifetimes_ and _borrowing_ in more detail in future examples. Just one last explanation: `'static` is actually a special lifetime (and the _only_ special lifetime which exists). It says that the resource has the [lifetime of the entire program](https://doc.rust-lang.org/book/lifetimes.html#static). Note that string literals like `"Hello world!"` _always_ have a lifetime of `'static`.
 
@@ -375,7 +375,7 @@ $ npm start
 Required "Hello world!".
 ```
 
-Good. Now we switch to Rust. As I said in our [setup](../setup/README.md) `$ cargo install` actually installs only _globally_ and only crates which should be used as a command line tool. Think about the times you installed something like `$ npm install -g gulp-cli`. If `gulp` would exist in Cargo we would install it pretty much this way: `$ cargo install gulp`.
+Good. Now we switch to Rust. As I said in our [setup](../setup) `$ cargo install` actually installs only _globally_ and only crates which should be used as a command line tool. Think about the times you installed something like `$ npm install -g gulp-cli`. If `gulp` would exist in Cargo we would install it pretty much this way: `$ cargo install gulp`.
 
 However the crate we created earlier isn't a command line tool, but a library. We can't add it to our project via the command line. At least not with `cargo install` - in the future Cargo will probably support a [`cargo add`](https://github.com/rust-lang/cargo/issues/4#issuecomment-187241132) to do so. Currently we need to add it to our `Cargo.toml` manually in a section called `[dependencies]`. It looks like this:
 
@@ -434,3 +434,8 @@ Required "Hello world!".
 ```
 
 It works! :tada:
+
+______
+
+<!-- ← [prev](../setup) | [next](../?) → -->
+← [prev](../setup)
