@@ -28,7 +28,7 @@ How do we move on from here? First I'll guide you how my current setup looks lik
 
 # Table of contents
 
-0. [Setup](setup/README.md)
+0. [Setup](setup)
 0. [Hello World](hello-world/README.md)
 0. [Package Manager](package-manager/README.md)
 
