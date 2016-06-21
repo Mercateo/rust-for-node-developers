@@ -82,11 +82,13 @@ If you don't accidentally want to publish a module to a public repository you ca
 
 To add a single license you write `"license": "MIT"` in npm and `license = "MIT"` in Cargo. Using multiple licenses is slightly different in its syntax thou: `"license": "(MIT OR Apache-2.0)"` for npm and `license = "MIT/Apache-2.0"` for Cargo. ([Don't use `licenses` in npm!](https://docs.npmjs.com/files/package.json#license))
 
-You can also optionally add multiple `keywords`, so your package can't be found more easily in the official repositories.
+You can also optionally add multiple `keywords`, so your package cat be found more easily in the official repositories.
 
 You can add a link to your `homepage` and `repository` in both files (with a slightly different format for `repository`). npm allows you to add a link to reports `bugs` while Cargo allows you to add a link to find `documentation`.
 
-_Both_ package managers can be used as build tools as weel. npm needs a little bit more configuration thou. I'll show this in more in-depth when I introduce TypeScript to our Node projects. For now I just added a `main` and `scripts.start` field, so you can run our project via npm. It looks like that:
+## Build tool
+
+_Both_ package managers can be used as build tools as well. npm needs a little bit more configuration though. I'll show this in more in-depth when I introduce TypeScript to our Node projects. For now I just added a `main` and `scripts.start` field, so we can run our project via npm. It looks like that:
 
 ```bash
 $ npm start
@@ -104,7 +106,7 @@ $ npm start -s
 Hello world!
 ```
 
-While I can choose my entry file in npm (`src/index.js` is quite common, but not enforced), you need to use `src/main.rs` for Cargo  (or `src/lib.rs` for library projects).
+While npm allows you to change the entry file by setting `main` (`src/index.js` is quite common, but not enforced), you can specify several binary files and at most one library file for Cargo to build an run. If Cargo find a `src/main.rs`, it will build/run a binary; if there is a `src/lib.rs`, it will build a library (crates can contain both).
 
 You run your Rust project with Cargo like this:
 
@@ -150,7 +152,7 @@ This becomes more interesting if you want to lock down  dependencies (and depend
 
 ## Publishing
 
-Before we learn how to install and use a dependency we will actually publish a package that we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for _"Rust for Node developers"_). npm offers namespacing of modules called [_scoped packages_](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is an [intended limitation](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
+Before we learn how to install and use dependencies we will actually publish a package that we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for _"Rust for Node developers"_). npm offers namespacing of modules called [_scoped packages_](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is an [intended limitation](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
 
 I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but I think it'll simplify some comparisons between Node and Rust in the future when I use types or modern ES2015 features like modules. First we need to install TypeScript as a `devDependency`:
 
