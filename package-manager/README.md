@@ -82,7 +82,7 @@ If you don't accidentally want to publish a module to a public repository you ca
 
 To add a single license you write `"license": "MIT"` in npm and `license = "MIT"` in Cargo. Using multiple licenses is slightly different in its syntax thou: `"license": "(MIT OR Apache-2.0)"` for npm and `license = "MIT/Apache-2.0"` for Cargo. ([Don't use `licenses` in npm!](https://docs.npmjs.com/files/package.json#license))
 
-You can also optionally add multiple `keywords`, so your package cat be found more easily in the official repositories.
+You can also optionally add multiple `keywords`, so your package can be found more easily in the official repositories.
 
 You can add a link to your `homepage` and `repository` in both files (with a slightly different format for `repository`). npm allows you to add a link to reports `bugs` while Cargo allows you to add a link to find `documentation`.
 
