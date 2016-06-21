@@ -437,5 +437,4 @@ It works! :tada:
 
 ______
 
-<!-- ← [prev](../setup) | [next](../?) → -->
-← [prev](../setup)
+← [prev](../setup) | [next](../read-files) →

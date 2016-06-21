@@ -31,5 +31,6 @@ How do we move on from here? First I'll guide you how my current setup looks lik
 0. [Setup](setup)
 0. [Hello World](hello-world)
 0. [Package Manager](package-manager)
+0. [Read files](read-files)
 
 Thank you for reading this article. ♥
