@@ -2,7 +2,7 @@
 
 ## Meta Data
 
-Node and Rust both come with a package manager. Nodes package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). Rusts package manager is called _Cargo_, its packages are called _crates_ and its official website is [creates.io](https://crates.io/).
+Node and Rust both come with a package manager. Nodes package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). Rusts package manager is called _Cargo_, its packages are called _crates_ and its official website is [crates.io](https://crates.io/).
 
 ![official npm website](./npm-site.png)
 ![official Cargo website](./cargo-site.png)
