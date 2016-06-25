@@ -8,7 +8,7 @@ fn main() {
         Ok(file) => file,
     };
 
-    let mut data = "";
+    let mut data = String::new();
     match file.read_to_string(&mut data) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
         Ok(_) => print!("Content is: {}", data),
