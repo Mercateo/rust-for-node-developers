@@ -34,3 +34,5 @@ How do we move on from here? First I'll guide you how my current setup looks lik
 0. [Read files](read-files)
 
 Thank you for reading this article. ♥
+
+I highly appreciate pull requests for grammar and spelling fixes as I'm not a native speaker. Thank you!
