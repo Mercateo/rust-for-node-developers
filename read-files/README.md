@@ -296,5 +296,4 @@ We could simplify our example even more with less verbose error handling, but I'
 
 ______
 
-<!-- ← [prev](../setup) | [next](../?) → -->
-← [prev](../package-manager)
+← [prev](../package-manager) | [next](../write-files) →

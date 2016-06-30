@@ -1,0 +1,14 @@
+{
+  "name": "write-files",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "start": "npm run build && node dist",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "^1.8.10"
+  }
+}
