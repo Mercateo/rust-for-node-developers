@@ -24,7 +24,9 @@ function main() {
 
 Nothing too scary, right? The `!` behind `println` could be a bit confusing, but don't mind it for now. Just think of it as a special function.
 
-How do we move on from here? First I'll guide you how my current setup looks like to use Node and Rust. After that I'll create several kitchen sink like examples - first with Node and then with Rust. I'll try to explain them as best as I can, but _don't_ expect in-depth explanations in every case. Don't forget that I'm trying to learn Rust - _just like you_. Probably you need to explain _me_ some things, too! Oh, and before I forget it: my Node examples will be written in [TypeScript](https://www.typescriptlang.org/) actually! I think it makes some examples easier to compare to Rust and if you experience sweet code completion for Rust you want a little bit of that in your Node projects anyway ;)
+How do we move on from here? First I'll guide you how my current setup looks like to use Node and Rust. After that I'll create several kitchen sink like examples - first with Node and then with Rust. I'll try to explain them as best as I can, but _don't_ expect in-depth explanations in every case. Don't forget that I'm trying to learn Rust - _just like you_. Probably you need to explain _me_ some things, too! Oh, and before I forget it: my Node examples will be written in [TypeScript](https://www.typescriptlang.org/) actually! I think it makes some examples easier to compare to Rust and if you experience sweet type safety from Rust you want a little bit of that in your Node projects anyway ;)
+
+I try to add an example every two weeks.
 
 # Table of contents
 
