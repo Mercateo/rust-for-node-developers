@@ -11,6 +11,6 @@ fn main() {
     let mut data = String::new();
     match file.read_to_string(&mut data) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
-        Ok(_) => print!("Content is: {}", data),
+        Ok(_) => println!("Content is: {}", data),
     }
 }

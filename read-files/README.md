@@ -133,7 +133,7 @@ fn main() {
         Ok(value) => value,
     };
 
-    print!("Content is: {}", data);
+    println!("Content is: {}", data);
 }
 ```
 
@@ -258,7 +258,7 @@ let data = match from_utf8(&buffer) {
     Ok(value) => value,
 };
 
-print!("Content is: {}", data);
+println!("Content is: {}", data);
 ```
 
 Nothing fancy here. We just convert our `buffer` to a `&str` with `from_utf8`. Note that we pass `&buffer` to `from_utf8` which means that `from_utf8` gets a _reference_ (with `&`) of `buffer`. So `&` is a _reference_ to a resource and `&mut` is a _mutable reference_ to a resource. `from_utf8` doesn't need to change `buffer`'s values so the reference doesn't need to be mutable.
@@ -283,7 +283,7 @@ fn main() {
     let mut data = String::new();
     match file.read_to_string(&mut data) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
-        Ok(_) => print!("Content is: {}", data),
+        Ok(_) => println!("Content is: {}", data),
     }
 }
 ```
