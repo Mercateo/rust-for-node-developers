@@ -396,7 +396,7 @@ extern crate rfnd_hello_world;
 use rfnd_hello_world::HELLO_WORLD;
 
 fn main() {
-    println!("Required \"{}\".", HELLO_WORLD);
+    println!("Required: {}.", HELLO_WORLD);
 }
 ```
 Note that even though our external crate is called `rfnd-hello-world` we access it with `rfnd_hello_world`.
@@ -407,7 +407,7 @@ As we use `HELLO_WORLD` just a single time we could also have written the exampl
 extern crate rfnd_hello_world;
 
 fn main() {
-    println!("Required \"{}\".", rfnd_hello_world::HELLO_WORLD);
+    println!("Required: {}.", rfnd_hello_world::HELLO_WORLD);
 }
 ```
 
@@ -420,8 +420,8 @@ extern crate rfnd_hello_world;
 use rfnd_hello_world::{HELLO_WORLD, FOO};
 
 fn main() {
-    println!("Required \"{}\".", HELLO_WORLD);
-    println!("Also \"{}\".", FOO);
+    println!("Required: {}.", HELLO_WORLD);
+    println!("Also: {}.", FOO);
 }
 ```
 
