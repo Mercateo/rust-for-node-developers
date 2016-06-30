@@ -12,5 +12,5 @@ fn main() {
     match file.read_to_string(&mut data) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
         Ok(_) => println!("Content is: {}", data),
-    }
+    };
 }

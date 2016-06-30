@@ -126,7 +126,7 @@ fn main() {
     match file.read(&mut buffer) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
         Ok(_) => (),
-    }
+    };
 
     let data = match from_utf8(&buffer) {
         Err(err) => panic!("Couldn't convert buffer to string: {}", err.description()),
@@ -243,7 +243,7 @@ Finally our `buffer` is flagged as `mut`, because it will change its values when
 match file.read(&mut buffer) {
     Err(err) => panic!("Couldn't read: {}", err.description()),
     Ok(_) => (),
-}
+};
 ```
 
 We pass `buffer` to `file.read` with `&mut`. That means that `buffer` is passed to `file.read` as a _mutable reference_. This is needed to _allow_ `file.read` to change `buffer`. (It is not enough to flag `buffer` as `mut` in general, we need to allow this to other functions or method in every case, where it is intended.) _Allowing_ this is actually a core feature of Rust called _ownership_. I mentioned that [earlier](../package-manager) and we'll see it in a lot of examples, because it is such an essential feature to Rust. `file.read` _borrows_ `buffer` for as long as `file.read` _runs_. If it quits our `main` function becomes the owner of `buffer` again. Doing so ensures that only _one_ function is the owner of a piece of memory at a time and prevents data races. This makes Rust so safe.
@@ -284,7 +284,7 @@ fn main() {
     match file.read_to_string(&mut data) {
         Err(err) => panic!("Couldn't read: {}", err.description()),
         Ok(_) => println!("Content is: {}", data),
-    }
+    };
 }
 ```
 
