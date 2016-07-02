@@ -199,7 +199,7 @@ Note that we'll generate CommonJS modules (because this is a Node project), it w
 
 Note that we don't want to commit our `node_modules` and `dist` to our repository, because these directories contain external or generated code. But be **warned**! If you place these directories in a `.gitignore` npm will _not_ include them in our published package. This okay for `node_modules` (which are _never_ included anyway), but a package without `dist` is pointless. You'll actually need to add an empty `.npmignore`, so npm ignores the `.gitignore`. (A little bit tricky, I know.) You can use the `.npmignore` to ignore files and directories which are committed in your repository, but shouldn't be included in your published package.
 
-With this setup aside this is our actual package:
+With this setup aside this is our actual package under `index.ts`:
 
 ```typescript
 export const HELLO_WORLD = 'Hello world!';
