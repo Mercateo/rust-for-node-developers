@@ -2,7 +2,7 @@
 
 ## Node
 
-In our [last example](../read-files) we used `readFile` to read the content of a file and switched to a combination of `openSync` and `readSync` to achieve the same goal in a low-level manner and synchronous way to make it easier comparable to Rust. Now we switch to `readFileSync` to keep things easier.
+In our [last example](../read-files) we used `readFile` to read the content of a file and switched to a combination of `openSync` and `readSync` to achieve the same goal in a low-level manner and synchronous way to make it easier comparable to Rust. Now we switch to `readFileSync` to keep things easier. We reuse our basic project structure with typings for this.
 
 In this example we want to read two files: `hello.txt` and `world.txt`. They contain just a single word - `Hello` and `world`. We concatenate the content of both files and write it into a new file `hello-world.txt`. Its contain should be `Hello world!` at the end. (The ` ` and the `!` will be added by us.)
 
@@ -438,4 +438,4 @@ Awesome! In this example your learned different error handling patterns, differe
 
 ______
 
-← [prev](../read-files)
+← [prev](../read-files) | [next](../http-requests) →

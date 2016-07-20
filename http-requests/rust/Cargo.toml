@@ -1,0 +1,7 @@
+[package]
+name = "http-requests"
+version = "1.0.0"
+publish = false
+
+[dependencies]
+hyper = "0.9.0"
