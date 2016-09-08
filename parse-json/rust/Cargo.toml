@@ -1,0 +1,10 @@
+[package]
+name = "parse-json"
+version = "1.0.0"
+publish = false
+
+[dependencies]
+hyper = "0.9"
+serde = "0.8"
+serde_macros = "0.8"
+serde_json = "0.8"

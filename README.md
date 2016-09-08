@@ -36,6 +36,7 @@ I try to add an example every two weeks.
 0. [Read files](read-files)
 0. [Write files](write-files)
 0. [HTTP requests](http-requests)
+0. [Parse JSON](parse-json)
 
 Thank you for reading this article. ♥
 
