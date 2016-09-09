@@ -196,10 +196,39 @@ Run it now and you should see this:
 ```bash
 $ cargo run -q
 Result is:
-[Repository { name: "ajv", description: "The fastest JSON schema Validator. Supports v5 proposals", fork: true }, Repository { name: "angular", description: "Code to optimize AngularJS for complex pages", fork: true },...
+[Repository { name: "ajv", description: "The fastest JSON schema Validator. Supports v5 proposals", fork: true }, Repository { name: "angular", description: "Code to optimize AngularJS for complex pages", fork: true }, ...]
 ```
 
 You see that our `Vec<Repository>` is printed with `{:?}` in the format `[Repository { name, description, fork }, ...]`. Thanks to `#[derive(Debug)]`!
+
+But that is not all: The [string formatting](https://doc.rust-lang.org/nightly/std/fmt/index.html) in Rust allow you to do a bunch of really cool things, e.g., padding inputs to a certain length or choosing representations for numbers. One of the most amazing features is the "alternate mode", which you can trigger with an `#`. The alternate mode for `Debug` is to pretty-print the data, so it gets split up in lines and is nicely indented!
+
+If we change our `println` to
+
+```rust
+println!("Result is:\n{:#?}", repositories);
+//                      ^-- added a `#` here
+```
+
+it will now output our data like this:
+
+```bash
+$ cargo run -q
+Result is:
+[
+    Repository {
+        name: "ajv",
+        description: "The fastest JSON schema Validator. Supports v5 proposals",
+        fork: true
+    },
+    Repository {
+        name: "angular",
+        description: "Code to optimize AngularJS for complex pages",
+        fork: true
+    },
+    ...
+]
+```
 
 Phew. A lot of new concepts and unstable features to parse JSON in an ergonomic way. But it _is_ ergonomic and powerful, if you use these features.
 
