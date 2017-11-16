@@ -152,7 +152,7 @@ On the following site you can choose between stable and insider releases. The in
 
 Now we will install [Rusty Code](https://github.com/saviorisdead/RustyCode) the Rust extension for VS Code. Just open VS Code, press `⌘P` (Quick Open) and type `ext install RustyCode`. Click on _Rusty Code_.
 
-After that we need to install [Racer](https://github.com/phildawes/racer). This is used by Rusty Code to get code completion for Rust. You can install Racer easily with Rusts package manager called Cargo, which was installed alongside with Rust. I'll introduce you to Cargo in more detail in the chapter about [package manager](../package-manager). For now you can install Racer with the following command:
+After that we need to install [Racer](https://github.com/phildawes/racer). This is used by Rusty Code to get code completion for Rust. You can install Racer easily with Rusts package manager called Cargo, which was installed alongside with Rust. I'll introduce you to Cargo in more detail in the chapter about [package manager](../package-manager/README.md). For now you can install Racer with the following command:
 
 ```bash
 $ cargo install racer
@@ -191,4 +191,4 @@ Last but not least you'll want to install the [TOML extension](https://marketpla
 
 ______
 
-[next](../hello-world) →
+[next](../hello-world/README.md) →

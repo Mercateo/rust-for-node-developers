@@ -4,7 +4,7 @@
 
 In our last example we made an HTTPS request against the GitHub API with Node and Rust. That worked fine, but we got back a raw string as JSON. Not very usefull. This time we'll learn how to parse the JSON and extract the information we need. For this example we'll request the repositories of a specific GitHub user and we'll log the name and description of the repository and if it was forked.
 
-Our [Node example](../http-requests) doesn't need to change much to achieve that:
+Our [Node example](../http-requests/README.md) doesn't need to change much to achieve that:
 
 ```diff
 import { get } from 'https';
@@ -93,7 +93,7 @@ hyper = "0.9"
 +serde_json = "0.8"
 ```
 
-Sadly there is one more step involved to parse JSON with `serde`. We need to switch to a nightly build of Rust. At least for now. I'll tell you in a minute why. Just install nightly with [`rustup`](../setup).
+Sadly there is one more step involved to parse JSON with `serde`. We need to switch to a nightly build of Rust. At least for now. I'll tell you in a minute why. Just install nightly with [`rustup`](../setup/README.md).
 
 ```bash
 $ rustup install nightly
@@ -126,7 +126,7 @@ We can pass additional data to attributes (`#[inline(always)]`) or keys and valu
 
 For now _every_ attribute is defined by the Rust compiler and we want to use an attribute called `derive` which is only available in nightlies. `derive` allows us to automatically implement certain traits for a custom struct. The trait we're interested in is [`Deserialize`](https://docs.serde.rs/serde/de/trait.Deserialize.html) from... you guessed it: `serde`!
 
-Let us look at modified [Rust example](../http-requests) :
+Let us look at modified [Rust example](../http-requests/README.md) :
 
 ```diff
 +#![feature(custom_derive, plugin)]
@@ -240,4 +240,4 @@ I guess as a JavaScript developers you just need to get comfortable to move more
 
 ______
 
-← [prev](../http-requests)
+← [prev](../http-requests/README.md)
