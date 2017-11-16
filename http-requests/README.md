@@ -231,11 +231,11 @@ fn main() {
 }
 ```
 
-First we tell the compiler that we want to use an external crate called `hyper`. Than we import `std::io::Read` which you should know from our [_read files exampe_](../read-files) and we import `hyper::Client` which allows us to make requests.
+First we tell the compiler that we want to use an external crate called `hyper`. Than we import `std::io::Read` which you should know from our [_read files exampe_](../read-files/README.md) and we import `hyper::Client` which allows us to make requests.
 
 In our `main` function we set our `url` containing the protocol, host and path for our request. After that we create a new instance of the [`Client` struct](http://hyper.rs/hyper/0.8.0/hyper/client/struct.Client.html) which we call `client`. `client` has a `get` method which we can pass our `url` into. It will _not_ start the request immediately, but return an instance of the [`RequestBuilder` struct](http://hyper.rs/hyper/v0.9.10/hyper/client/struct.RequestBuilder.html). This one has a `send` method which will start the request. `send` returns `Result<Response>`, so we call `expect` to handle the `Error` case and get an instance of [`Response` struct](http://hyper.rs/hyper/0.8.0/hyper/client/response/struct.Response.html) as the result in the `Ok` case.
 
-After that we read our result into a buffer (`buf`) and print the response body. This should also be familiar from the [_read files exampe_](../read-files).
+After that we read our result into a buffer (`buf`) and print the response body. This should also be familiar from the [_read files exampe_](../read-files/README.md).
 
 If you run our program now you see the same error as in our first Node example:
 
@@ -340,4 +340,4 @@ The Node and the Rust example both show the same result now. Nice. In the next e
 
 ______
 
-← [prev](../write-files) | [next](../parse-json) →
+← [prev](../write-files/README.md) | [next](../parse-json/README.md) →

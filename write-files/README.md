@@ -2,7 +2,7 @@
 
 ## Node
 
-In our [last example](../read-files) we used `readFile` to read the content of a file and switched to a combination of `openSync` and `readSync` to achieve the same goal in a low-level manner and synchronous way to make it easier comparable to Rust. Now we switch to `readFileSync` to keep things easier. We reuse our basic project structure with typings for this.
+In our [last example](../read-files/README.md) we used `readFile` to read the content of a file and switched to a combination of `openSync` and `readSync` to achieve the same goal in a low-level manner and synchronous way to make it easier comparable to Rust. Now we switch to `readFileSync` to keep things easier. We reuse our basic project structure with typings for this.
 
 In this example we want to read two files: `hello.txt` and `world.txt`. They contain just a single word - `Hello` and `world`. We concatenate the content of both files and write it into a new file `hello-world.txt`. Its contain should be `Hello world!` at the end. (The ` ` and the `!` will be added by us.)
 
@@ -178,7 +178,7 @@ Content is: world
 
 Fine. Now we can look into different ways of handling errors in Rust before we'll add the actual part of writing files.
 
-The patterns we used for now was using `panic!` which allows adding a custom error message and exits our program. This is okay, but a little bit verbose. The shortest way for error handling is calling `unwrap()` on functions returning a `Result`. (Remember from the [last example](../read-files) that the `Result` type has an `Err` case and an `Ok` case which we both _need_ to handle. This can be done with pattern matching like we did for now.) `unwrap` _just_ exits the program on `Err` or returns the result on `Ok`, but you cannot pass a custom error message. It looks like that.
+The patterns we used for now was using `panic!` which allows adding a custom error message and exits our program. This is okay, but a little bit verbose. The shortest way for error handling is calling `unwrap()` on functions returning a `Result`. (Remember from the [last example](../read-files/README.md) that the `Result` type has an `Err` case and an `Ok` case which we both _need_ to handle. This can be done with pattern matching like we did for now.) `unwrap` _just_ exits the program on `Err` or returns the result on `Ok`, but you cannot pass a custom error message. It looks like that.
 
 ```diff
 -use std::error::Error;
@@ -438,4 +438,4 @@ Awesome! In this example your learned different error handling patterns, differe
 
 ______
 
-← [prev](../read-files) | [next](../http-requests) →
+← [prev](../read-files/README.md) | [next](../http-requests/README.md) →

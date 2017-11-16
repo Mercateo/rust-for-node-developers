@@ -44,4 +44,4 @@ Now you'll see `Hello world!` in your console. This shows a fundamental differen
 
 ______
 
-← [prev](../setup) | [next](../package-manager) →
+← [prev](../setup/README.md) | [next](../package-manager/README.md) →
