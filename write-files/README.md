@@ -360,7 +360,7 @@ fn main() {
 -    hello_world.push_str(" ");
 -    hello_world.push_str(&world);
 -    hello_world.push_str("!");
-+    let hello_world = hello + " " + &world + "!";
++    let hello_world = &hello + " " + &world + "!";
 
     println!("Content is: {}", hello_world);
 }
