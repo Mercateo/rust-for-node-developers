@@ -33,7 +33,7 @@ Great! With that out of the way we can create our example.
 
 To read a file and log its content I probably would write a program like this:
 
-```typescript
+```ts
 import { readFile } from 'fs';
 
 readFile('hello.txt', 'utf8', (err, data) => {
@@ -46,11 +46,11 @@ readFile('hello.txt', 'utf8', (err, data) => {
 });
 ```
 
-You import the `readFile` function, pass the file path (`'hello.txt`), optionally pass an encoding (`'utf8'`) and pass a callback which is called when the file was read _or_ if an error appeared. By convention the first param of this callback is the error object (`err`) - _if_ an error appeared - and the second param is the content of the file (`data`) - if _no_ error appeared. We check both of these cases with an `if`/`else` statement. Note that in the case of an error we log its `message`, a human readable error description. It is not available on every `err` object, but for all typical errors associated with file reading (like `ENOENT: no such file or directory, open 'hello.txt'`, if the file couldn't be found). I also call `process.exit(1);` to stop the execution of the program and mark the `process` as a failure. This is a good style to stop your program and useful if this program is used by other scripts or in continuous integration. If no error happened we just log our content: ``console.log(`Content is: ${data}`);``.
+You import the `readFile` function, pass the file path (`'hello.txt`), optionally pass an encoding (`'utf8'`) and pass a callback which is called when the file was read _or_ if an error appeared. By convention the first param of this callback is the error object (`err`) - _if_ an error appeared - and the second param is the content of the file (`data`) - if _no_ error appeared. We check both of these cases with an `if`/`else` statement. Note that in the case of an error we log its `message`, a human readable error description. It is not available on every `err` object, but for all typical errors associated with file reading (like `ENOENT: no such file or directory, open 'hello.txt'`, if the file couldn't be found). I also call `process.exit(1);` to stop the execution of the program and mark the `process` as a failure. This is a good style to stop your program and useful if this program is used by other scripts or in continuous integration. If no error happened we just log our content: `` console.log(`Content is: ${data}`); ``.
 
 Anyway... let's rewrite this example so it is easier comparable to our Rust program. Have a look at this new program:
 
-```typescript
+```ts
 import { openSync, readSync, fstatSync } from 'fs';
 
 let file;
@@ -94,7 +94,7 @@ The first thing you'll notice is the usage of some `*Sync` functions instead of 
 Let us test the program now:
 
 ```bash
-$ npm start -s
+$ npm -s start
 Content is: Hello world!
 ```
 
@@ -140,7 +140,7 @@ fn main() {
 I _think_ you can read the code and grasp what it does. It _should_ look very similar to our Node example. Does it work?
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Content is: Hello world!
 ```
 
@@ -158,7 +158,7 @@ use std::fs::File;
 use std::io::Read;
 ```
 
-This is surprising... if you look into our example we actually never use anything like `Read`. Try to remove this line and run `$ cargo run -q`. You'll get this error:
+This is surprising... if you look into our example we actually never use anything like `Read`. Try to remove this line and run `$ cargo -q run`. You'll get this error:
 
 ```
 src/main.rs:23:16: 23:20 error: no method named `read` found for type `std::fs::File` in the current scope
@@ -176,7 +176,7 @@ So what is a trait? To quote [Rust by Example](http://rustbyexample.com/trait.ht
 
 If I would need to compare to something in the Node world, I probably would compare it to function binding probably best shown with the [experimental `::` operator](https://github.com/zenparsing/es-function-bind) ([not implemented in TypeScript yet](https://github.com/Microsoft/TypeScript/issues/3508)):
 
-```typescript
+```ts
 import { someFoo } from 'cool-foos';
 import { doBar } from 'foo-utils';
 
@@ -216,7 +216,7 @@ let mut file = match File::open("hello.txt") {
 Wow! A lot to see here. We declare a variable with `let` called `file`. `file` is marked as `mut` which stands for mutability. If you worked with [React](https://facebook.github.io/react/) before you probably know the concept of mutability and immutability. _Every_ variable in Rust is _immutable by default_. When we read the `file` later on this will change the _reading position_ of `file` internally, so it needs to be `mut`.
 Next is `match File::open("hello.txt") {}`. Let me say this first: Rust has _no_ `try`/`catch` keywords! The possibility of an error is expressed by _types_ instead. `File::open` actually returns the `Result<File>` type. The `Result` type represents either success (`Ok`) or failure (`Err`). For now you can think of it as a JavaScript `Promise` - if this helps you to understand `Result`. The last part to understand this code snippet is the `match` keyword used for pattern matching. You can think of `match` as a super powerful `switch`/`case` (which isn't available in Rust at all, because it uses the more powerful `match`). What makes it so powerful? It enforces you to cover _every_ case. It is not possible to forget one.
 
-If `Result` is either `Ok` or `Err`, you need to handle both cases. So we cover both cases. Every case can give us a variable. `Err` can contain an `err` (in JavaScript we would say that this is our `err` object) and `Ok` can contain the actual result (`value`). In the case of `Ok` we just _return_ `value` so it saved in `file`. (Yes, we can return values in pattern matching and save them directly to a variable. You don't see a `return` keyword here, so think of `Ok(value) => value` as `(value) => value` in JavaScript for now.) In the case of `Err` we call `panic!`. Remember that `!` marks a macro - which I introduced as _some code which is transformed into other code at compile time_ earlier. This explanation should still be enough to understand macros for now. `panic!` will log our error message and exit the program. So `panic!("Couldn't open: {}", err.description())` really works very much like ``console.log(`Couldn't get stat: ${err.message}`); process.exit(1);`` in our Node example.
+If `Result` is either `Ok` or `Err`, you need to handle both cases. So we cover both cases. Every case can give us a variable. `Err` can contain an `err` (in JavaScript we would say that this is our `err` object) and `Ok` can contain the actual result (`value`). In the case of `Ok` we just _return_ `value` so it saved in `file`. (Yes, we can return values in pattern matching and save them directly to a variable. You don't see a `return` keyword here, so think of `Ok(value) => value` as `(value) => value` in JavaScript for now.) In the case of `Err` we call `panic!`. Remember that `!` marks a macro - which I introduced as _some code which is transformed into other code at compile time_ earlier. This explanation should still be enough to understand macros for now. `panic!` will log our error message and exit the program. So `panic!("Couldn't open: {}", err.description())` really works very much like `` console.log(`Couldn't get stat: ${err.message}`); process.exit(1); `` in our Node example.
 
 Now move on to the next piece of code:
 
@@ -294,6 +294,6 @@ Question: Why do we use `let mut data = String::new();` instead of `let mut data
 
 We could simplify our example even more with less verbose error handling, but I'll leave this up to a future example.
 
-______
+---
 
-← [prev](../package-manager/README.md) | [next](../write-files/README.md) →
+← [prev _"Package Manager"_](../package-manager/README.md) | [next _"Write files"_](../write-files/README.md) →

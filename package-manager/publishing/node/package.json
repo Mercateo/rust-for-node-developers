@@ -1,0 +1,26 @@
+{
+  "name": "rfnd-hello-world",
+  "version": "1.0.1",
+  "author": "Donald Pipowitch <pipo@senaeh.de> (https://github.com/donaldpipowitch)",
+  "description": "This module exports a \"Hello world!\" string.",
+  "license": "Apache-2.0",
+  "keywords": [
+    "demo",
+    "hello-world"
+  ],
+  "homepage": "https://github.com/Mercateo/rust-for-node-developers",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mercateo/rust-for-node-developers"
+  },
+  "bugs": "https://github.com/Mercateo/rust-for-node-developers/issues",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --build src",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "typescript": "^3.2.2"
+  }
+}

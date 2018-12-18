@@ -194,7 +194,7 @@ We call `from_str` and pass our `buf` as a reference. `from_str` will try to par
 Run it now and you should see this:
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Result is:
 [Repository { name: "ajv", description: Some("The fastest JSON schema Validator. Supports v5 proposals"), fork: true }, Repository { name: "angular", description: Some("Code to optimize AngularJS for complex pages"), fork: true }, ...]
 ```
@@ -213,7 +213,7 @@ println!("Result is:\n{:#?}", repositories);
 it will now output our data like this:
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Result is:
 [
     Repository {
@@ -238,6 +238,6 @@ Phew. A lot of new concepts and unstable features to parse JSON in an ergonomic 
 
 I guess as a JavaScript developers you just need to get comfortable to move more work to the Rust compiler, so you can work more declarative using attributes in Rust.
 
-______
+---
 
-← [prev](../http-requests/README.md)
+← [prev _"HTTP requests"_](../http-requests/README.md)

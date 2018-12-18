@@ -2,32 +2,38 @@
 
 ## Meta Data
 
-Node and Rust both come with a package manager. Node's package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). Rust's package manager is called _Cargo_, its packages are called _crates_ and its official website is [crates.io](https://crates.io/).
+Node and Rust are both installed together with a package manager. Node's package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). Rust's package manager is called _Cargo_, its packages are called _crates_ and its official website is [crates.io](https://crates.io/).
 
 ![official npm website](./npm-site.png)
 ![official Cargo website](./cargo-site.png)
 
-If you followed my [Setup](../setup/README.md) and you use Node v4.4.5 you should update the bundled npm version, because it is relatively old by now. Node v4.4.5 comes with npm v2.15.5, but the current stable version is v3.9.5 at the time of writing this and v3 and v2 differ in a lot of ways. To update npm you just call this:
+If you followed my [Setup](../setup/README.md) and you use Node v10.14.2 your npm version is probably 6.4.1. You can check this by running the following command:
+
+```bash
+$ npm --version
+6.4.1
+```
+
+If you want to update npm you can run this:
 
 ```bash
 $ npm install -g npm
 ```
 
-And you can verify that the update worked like this:
-
-```bash
-$ npm --version
-3.9.5
-```
-
-As a reminder - I use Rust v1.9.0 and it comes with Cargo v0.10.0-nightly.
+Let us check our installed Cargo version. I have 1.31.0:
 
 ```bash
 $ cargo --version
-cargo 0.10.0-nightly (10ddd7d 2016-04-08)
+cargo 1.31.0 (339d9f9c8 2018-11-16)
 ```
 
-The _manifest file_ - the file which contains meta-data of your project like its name, its version, its dependencies and so on - is called `package.json` in the Node world and `Cargo.toml` in Rust.
+As you can see it prints the same version as our installed Rust compiler. It's best practice to update both tools in tandem with `rustup`:
+
+```bash
+$ rustup update
+```
+
+The _manifest file_ - the file which contains meta-data of your project like its name, its version, its dependencies and so on - is called `package.json` in the Node world and `Cargo.toml` in Rust. We'll now add manifest files to our [_"Hello World"_ examples](../hello-world/README.md), we created earlier.
 
 Lets have a look at a typical `package.json` without dependencies:
 
@@ -41,21 +47,14 @@ Lets have a look at a typical `package.json` without dependencies:
   ],
   "private": true,
   "description": "This is just a demo.",
-  "license": "(MIT OR Apache-2.0)",
-  "keywords": [
-    "demo",
-    "test"
-  ],
+  "license": "MIT OR Apache-2.0",
+  "keywords": ["demo", "test"],
   "homepage": "https://github.com/john.doe/hello-world",
   "repository": {
     "type": "git",
     "url": "https://github.com/john.doe/hello-world"
   },
-  "bugs": "https://github.com/john.doe/hello-world/issues",
-  "main": "src/index.js",
-  "scripts": {
-    "start": "node src"
-  }
+  "bugs": "https://github.com/john.doe/hello-world/issues"
 }
 ```
 
@@ -69,7 +68,7 @@ authors = ["John Doe <john.doe@email.com>",
            "Jane Doe <jane.doe@email.com>"]
 publish = false
 description = "This is just a demo."
-license = "MIT/Apache-2.0"
+license = "MIT OR Apache-2.0"
 keywords = ["demo", "test"]
 homepage = "https://github.com/john.doe/hello-world"
 repository = "https://github.com/john.doe/hello-world"
@@ -78,9 +77,9 @@ documentation = "https://github.com/john.doe/hello-world"
 
 So what have we here? Both manifest formats offer `name` and `version` fields which are **mandatory**. Adding the authors of a project is slightly different between the modules, but optional for both. npm assumes a main `author` for every package and multiple `contributors` while in Cargo you just fill an `authors` array. The `authors` field is actually **mandatory** for Cargo. As a value you use a string with the pattern `name <email> (url)` in npm and `name <email>` in Cargo. (Maybe `(url)` will be added in the future, but [currently it is not used](https://github.com/rust-lang/cargo/issues/2736) by anyone in Cargo.) Note that `<email>` and `(url)` are optional and that `name` doesn't have to be a person. You can just use you company name as well or something like `my cool team`.
 
-If you don't accidentally want to publish a module to a public repository you can do that with either `"private": true` in npm or `publish = false` in Cargo. You can optionally add a `description` field to describe your project. (I _think_ you can use [MarkDown in npm](https://github.com/iarna/in-publish/blob/94054a478c5658d58418e4b45ac848698e6b7cfa/package.json#L4), but not Cargo.)
+If you don't accidentally want to publish a module to a public repository you can do that with either `"private": true` in npm or `publish = false` in Cargo. You can optionally add a `description` field to describe your project. (While you technically could use [MarkDown](https://commonmark.org/) in your descriptions, the support is spotty in both ecosystems and it isn't rendered properly most of the time.)
 
-To add a single license you write `"license": "MIT"` in npm and `license = "MIT"` in Cargo. Using multiple licenses is slightly different in its syntax thou: `"license": "(MIT OR Apache-2.0)"` for npm and `license = "MIT/Apache-2.0"` for Cargo. ([Don't use `licenses` in npm!](https://docs.npmjs.com/files/package.json#license))
+To add a single license you write `"license": "MIT"` in npm and `license = "MIT"` in Cargo. In both cases the value needs to be an [SPDX license identifier](https://spdx.org/licenses/). If you use multiple licences you can use an [SPDX license expression](https://spdx.org/spdx-specification-21-web-version#h.jxpfx0ykyb60) like `"license": "MIT OR Apache-2.0"` for npm or `license = "MIT OR Apache-2.0"` for Cargo.
 
 You can also optionally add multiple `keywords`, so your package can be found more easily in the official repositories.
 
@@ -88,12 +87,26 @@ You can add a link to your `homepage` and `repository` in both files (with a sli
 
 ## Build tool
 
-_Both_ package managers can be used as build tools as well. npm needs a little bit more configuration though. I'll show this in more in-depth when I introduce TypeScript to our Node projects. For now I just added a `main` and `scripts.start` field, so we can run our project via npm. It looks like that:
+Cargo can be used to build your Rust project and you can add custom build scripts to npm as well. (Remember that you don't _need_ a build step in the Node ecosystem, but if you rely on something like TypeScript it is needed. I'll show this in more in-depth when I introduce TypeScript to our Node projects.)
+
+For now I just added a `main` and `scripts.start` field to our [`package.json`](meta-data/node/package.json):
+
+```json
+{
+  // ...your previous code
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}
+```
+
+A `main` field points to your packages entry file. This is the file that will be loaded, if someone requires _your_ package. `scripts.start` is a convention to point to the file which should be loaded, if you want to _run_ your package by calling `$ npm start`:
 
 ```bash
 $ npm start
 
-> hello-world@0.1.0 start /Users/philippzins/Workspace/rust/rust-for-node-developers/package-manager/node
+> hello-world@0.1.0 start /Users/pipo/workspace/rust-for-node-developers/package-manager/meta-data/node
 > node src
 
 Hello world!
@@ -102,16 +115,20 @@ Hello world!
 To ignore the npm output use `-s` (for `--silent`):
 
 ```bash
-$ npm start -s
+$ npm -s start
 Hello world!
 ```
 
-While npm allows you to change the entry file by setting `main` (`src/index.js` is quite common, but not enforced), you can specify several binary files and at most one library file for Cargo to build an run. If Cargo find a `src/main.rs`, it will build/run a binary; if there is a `src/lib.rs`, it will build a library (crates can contain both).
+In this case the entry file to our package specified in `main` and the file which should be run if you call `$ npm start` point to the same file, but this doesn't have to be the case. Additionally you could specify [multiple executable files in a field called `bin`](https://docs.npmjs.com/files/package.json#bin).
+
+Cargo on the other hand will look for a `src/main.rs` file to build and/or run and if it finds a `src/lib.rs` file, it will build a library which than can be required by a different crate.
 
 You run your Rust project with Cargo like this:
 
 ```bash
 $ cargo run
+   Compiling hello-world v0.1.0 (/Users/pipo/workspace/rust-for-node-developers/package-manager/meta-data/rust)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.61s
      Running `target/debug/hello-world`
 Hello world!
 ```
@@ -119,76 +136,79 @@ Hello world!
 To ignore the Cargo output use `-q` (for `--quiet`):
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Hello world!
 ```
 
-(Note: You _must_ write `cargo run -q` in this order while you could write `npm -s start` _or_ `npm start -s`.)
-
-You'll see that Cargo created a new file in your directory: a `Cargo.lock`. (It also placed your compiled program in a `target` directory.) This basically works like a `npm-shrinkwrap.json` in the Node world, but is generated by default. Just to be complete let us generate a `npm-shrinkwrap.json`:
+You'll see that Cargo created a new file in your directory: a `Cargo.lock`. (It also placed your compiled program in a `target` directory.) The `Cargo.lock` file basically works like a `package-lock.json` in the Node world (or a [`yarn.lock`](https://yarnpkg.com/lang/en/docs/yarn-lock/), if you use yarn instead of npm), but is also generated during builds. Just to be complete let us generate a `package-lock.json` as well:
 
 ```bash
-$ npm shrinkwrap
+$ npm install
+npm notice created a lockfile as package-lock.json. You should commit this file.
+up to date in 0.924s
+found 0 vulnerabilities
 ```
 
-This should be your `npm-shrinkwrap.json`:
+This should be your `package-lock.json`:
 
 ```json
 {
   "name": "hello-world",
-  "version": "0.1.0"
+  "version": "0.1.0",
+  "lockfileVersion": 1
 }
 ```
 
 This should be your `Cargo.lock`:
 
 ```toml
-[root]
+[[package]]
 name = "hello-world"
 version = "0.1.0"
 ```
 
-This becomes more interesting if you want to lock down  dependencies (and dependencies of depenendies) to a specific version.
+Both files become more interesting if you use dependencies in your project to ensure everyone uses the same dependencies (and dependencies of dependencies) at any time.
+
+Before we move on let us make a slight adjustment to our [`Cargo.toml`](meta-data/rust/Cargo.toml) by adding the line `edition = "2018"`. This will add support for [_Rust 2018_](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html) to our package. _Editions_ are a feature which allow to make backwards incompatible changes in Rust without introducing new major versions. You basically opt-in into new language features per package and your dependencies can be a mix of _different_ editions. Currently there are two different editions available: _Rust 2015_ (which is the default) and _Rust 2018_ (which is the newest).
 
 ## Publishing
 
-Before we learn how to install and use dependencies we will actually publish a package that we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for _"Rust for Node developers"_). npm offers namespacing of modules called [_scoped packages_](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is an [intended limitation](https://internals.rust-lang.org/t/crates-io-package-policies/1041). However they want to support other mechanisms for grouping multiple crates in the future. By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
+Before we learn how to install and use dependencies we will actually publish a package that we can require afterwards. It will just export a `Hello world!` string. I call both packages `rfnd-hello-world` (with `rfnd` as an abbreviation for _"Rust for Node developers"_). npm offers namespacing of modules called [_scoped packages_](https://docs.npmjs.com/misc/scope). If I'd have used that feature our module could have looked like this: `@rfnd/hello-world`. Cargo doesn't support namespacing and this is an [intended limitation](https://internals.rust-lang.org/t/crates-io-package-policies/1041). By the way... even if `snake_case` is preferred for files and directories in Rust the module names in Cargo should use `kebab-case` [by convention](https://users.rust-lang.org/t/is-it-good-practice-to-call-crates-hello-world-hello-world-or-does-it-not-matter/6114). This is probably used most of time in npm world, too.
 
-I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but I think it'll simplify some comparisons between Node and Rust in the future when I use types or modern ES2015 features like modules. First we need to install TypeScript as a `devDependency`:
+I'll introduce TypeScript for our Node module in this step. It isn't _that_ necessary currently, but it'll simplify some comparisons between Node and Rust in the next chapters when I use types or modern language features like [ES2015 modules](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import). First we need to install TypeScript as a `devDependency`:
 
 ```bash
 $ npm install --save-dev typescript
 ```
 
-To build the project we need to call the TypeScript compiler (`tsc`) as a new `build` entry in the `scripts` object of the `package.json`. We also add a `prepublish` entry which _always_ runs the build process before publishing our module:
+To build the project we need to call the TypeScript compiler (`tsc`) by adding a new `build` field in the `scripts` object of the `package.json`. We also add a `prepublishOnly` entry which _always_ runs the build process before we'll publish our module:
 
 ```json
 {
   "scripts": {
-    "build": "tsc",
-    "prepublish": "npm run build"
+    "build": "tsc --build src",
+    "prepublishOnly": "npm run build"
   }
 }
 ```
 
-`tsc` looks for a `tsconfig.json` in the project root which configures the actual output. It looks like this:
+By using `--build src` the TypeScript will look for a [`tsconfig.json` in the `src/` directory](package-manager/publishing/node/src/tsconfig.json) which configures the actual output. It looks like this:
 
 ```json
 {
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
-    "outDir": "dist",
-    "sourceMap": true
-  },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+    "outDir": "../dist",
+    "sourceMap": true,
+    "declarationMap": true
+  }
 }
 ```
 
-Note that we'll generate CommonJS modules (because this is a Node project), it will generate `declaration` files (so other TypeScript projects now our types and interfaces even when they use the generated JavaScript files), all JavaScript files will be placed in a `dist` folder and finally we generate Source Maps to map the generated JavaScript back to the original TypeScript code (useful for debugging). We also `exclude` the `node_modules` and `dist`, so `tsc` doesn't look for TypeScript files and declarations in these directories. This also means that the `main` field in our `package.json` now points to `dist/index.js` - our compiled JavaScript code. And we also add a `typings` field which show other modules where our generated declarations are stored.
+Note that we'll generate CommonJS modules (because this is a Node project), it will generate `declaration` files (so other TypeScript projects know our types and interfaces even when they use the generated JavaScript files), all JavaScript and declaration files will be placed in a `dist` folder and finally we generate Source Maps to map the generated JavaScript back to the original TypeScript code (useful for debugging).
+
+This also means that the `main` field in our [`package.json`](package-manager/publishing/node/package.json) now points to `dist/index.js` - our compiled JavaScript code. And we also add a `typings` field which shows other modules where our generated declarations are stored.
 
 ```json
 {
@@ -197,11 +217,11 @@ Note that we'll generate CommonJS modules (because this is a Node project), it w
 }
 ```
 
-Note that we don't want to commit our `node_modules` and `dist` to our repository, because these directories contain external or generated code. But be **warned**! If you place these directories in a `.gitignore` npm will _not_ include them in our published package. This okay for `node_modules` (which are _never_ included anyway), but a package without `dist` is pointless. You'll actually need to add an empty `.npmignore`, so npm ignores the `.gitignore`. (A little bit tricky, I know.) You can use the `.npmignore` to ignore files and directories which are committed in your repository, but shouldn't be included in your published package.
+Note that we don't want to commit our `node_modules` and `dist` to our repository, because these directories contain external or generated code. But be **warned**! If you place these directories in a `.gitignore` npm will _not_ include them in our published package. This okay for `node_modules` (which are _never_ included anyway), but a package without `dist` is pointless. You'll actually need to add an empty `.npmignore`, so npm ignores the `.gitignore`. (A little bit tricky, I know.) You can use the `.npmignore` to ignore files and directories which are committed in your repository, but shouldn't be included in your published package. In our case it'd be fine to include everything. As an alternative you could also explicitly list all files which should be included in a [`files` field](https://docs.npmjs.com/files/package.json#files) in your `package.json`.
 
 With this setup aside this is our actual package under `index.ts`:
 
-```typescript
+```ts
 export const HELLO_WORLD = 'Hello world!';
 ```
 
@@ -209,21 +229,33 @@ We `export` a `const` with the value `'Hello world!'`. This is ES2015 module syn
 
 This is how our generated `dist/index.js` looks like:
 
-```javascript
-"use strict";
+```js
+'use strict';
+exports.__esModule = true;
 exports.HELLO_WORLD = 'Hello world!';
 //# sourceMappingURL=index.js.map
 ```
 
-Nothing fancy. Basically the same code in a different module syntax. The last line links our file to the corresponding Source Map. The generated declaration file `dist/index.d.ts` is also worth a look:
+Nothing fancy. Basically the same code in a different module syntax. The second line tells other tools that it was originaly an ES2015 module. The last line links our file to the corresponding Source Map.
 
-```typescript
-export declare const HELLO_WORLD: string;
+The generated declaration file `dist/index.d.ts` is also worth a look:
+
+```ts
+export declare const HELLO_WORLD = 'Hello world!';
+//# sourceMappingURL=index.d.ts.map
 ```
 
-You see that TypeScript could infer the type of `HELLO_WORLD` as a `string`. We didn't need to that explicitly. We _could_ have done that. It would have looked like that:
+You see that TypeScript could infer the type of `HELLO_WORLD` as a `'Hello world!'`. This is a _value type_ which is in this case a special variant of the type `string` with the concrete value `'Hello world!'`.
 
-```typescript
+We didn't need to tell TypeScript the type explicitly, but we _could_ have done that. It would have looked like that:
+
+```ts
+export const HELLO_WORLD: 'Hello world!' = 'Hello world!';
+```
+
+Or like this, if we'd just want to tell others that it is a string:
+
+```ts
 export const HELLO_WORLD: string = 'Hello world!';
 ```
 
@@ -232,42 +264,46 @@ Great. This is our module. Now it needs to be published. You need to create an a
 ```bash
 $ npm publish
 
-> rfnd-hello-world@1.0.0 prepublish /Users/donaldpipowitch/Workspace/node-hello-world
+> rfnd-hello-world@1.0.1 prepublishOnly .
 > npm run build
 
 
-> rfnd-hello-world@1.0.0 build /Users/donaldpipowitch/Workspace/node-hello-world
-> tsc
+> rfnd-hello-world@1.0.1 build /Users/pipo/workspace/rust-for-node-developers/package-manager/publishing/node
+> tsc --build src
 
-+ rfnd-hello-world@1.0.0
+# some output from npm notice...
+
++ rfnd-hello-world@1.0.1
 ```
 
-Congratulations! :tada: You successfully created a package which can be seen [here](https://www.npmjs.com/package/rfnd-hello-world). (It looks like npm currently encodes the `"` from the description. This is an [open issue](https://github.com/npm/newww/issues/1789).)
+Congratulations! 🎉 You successfully created a package which can be seen [here](https://www.npmjs.com/package/rfnd-hello-world).
 
-Time for Rust! We first create a `.gitignore` with the following content:
+Time for Rust! We first create a [`.gitignore`](publishing/rust/.gitignore) with the following content:
 
 ```
 Cargo.lock
 target
 ```
 
-As pointed out earlier `Cargo.lock` behaves similar to `npm-shrinkwrap.json`. You _want_ that for executables, but not libraries which are used by others, so we don't commit it to our repository. The `target` directory will contain generated code, so it is also ignored.
+As pointed out earlier `Cargo.lock` behaves similar to `package-lock.json`, but while the `package-lock.json` can always be committed into your version control the `Cargo.lock` should only be committed [for binary projects, not libraries](https://doc.rust-lang.org/cargo/faq.html#why-do-binaries-have-cargolock-in-version-control-but-not-libraries). Npm ignores the `package-lock.json` in libraries, but Cargo doesn't do the same for `Cargo.lock`.
 
-Actually this is all the setup we need. Now dive into our package (living in `src/lib.rs`, because this will be a library):
+The `target` directory will contain generated code, so it is also ignored.
+
+Actually this is all the setup we need. Now dive into our package (living in [`src/lib.rs`](publishing/rust/src/lib.rs), because this will be a library):
 
 ```rust
-pub const HELLO_WORLD: &'static str = "Hello world!";
+pub const HELLO_WORLD: &str = "Hello world!";
 ```
 
-As you can see this line of code in Rust is really similar to our TypeScript code which looked like this:
+As you can see this line of code in Rust is really similar to our TypeScript code (when we excplicitly set the type to `string`) which looked like this:
 
-```typescript
+```ts
 export const HELLO_WORLD: string = 'Hello world!';
 ```
 
-`pub` makes our `const` _public_ (much like `export` in JavaScript). Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here or we'll get compiler errors. (Rust also supports type infering, but it looks like `const` always requires an [explicit type annotation](http://rustbyexample.com/custom_types/constants.html). Maybe this [could change in the future](https://users.rust-lang.org/t/when-i-export-a-str-as-const-why-do-i-need-to-set-its-type-and-lifetime/6112/2) for cases like this one.) [As noted earlier](../hello-world/README.md) `"Hello world!"` is called a _string literal_. Its type is `&str` (spoken as _string slice_). Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples.
+Let's go throught this word for word.
 
-But what is the meaning behind `'static`? This is a so called [_lifetime_](https://doc.rust-lang.org/book/lifetimes.html) - a concept which is very unique to Rust and one of its big advantages. But because it is so unique and new it is probably also the biggest hurdle while learning Rust. Together with the concept of [_borrowing_](https://doc.rust-lang.org/book/references-and-borrowing.html) it forms a feature called [_ownership_](https://doc.rust-lang.org/book/ownership.html). Ownership is Rust's way to guarantee memory safety without introducing a garbage collector. This is done at compile time, not runtime and the part in the compiler which does this check is called _borrow checker_. A lifetime tells the compiler how long a resource _lives_. That means how long this resource is available in memory. For now I like to think about lifetimes as _meta data_ associated to a variable or constant very much like a type (e.g. `&str`). Thanks to type infering we don't need to add types for every variable and the same is true for lifetimes. Sometimes we need to tell the compiler a lifetime and sometimes not. This is probably not a fully satisfying answer and you have questions, but we'll explore _ownership_, _lifetimes_ and _borrowing_ in more detail in future examples. Just one last explanation: `'static` is actually a special lifetime (and the _only_ special lifetime which exists). It says that the resource has the [lifetime of the entire program](https://doc.rust-lang.org/book/lifetimes.html#static). Note that string literals like `"Hello world!"` _always_ have a lifetime of `'static`.
+`pub` makes our variable _public_ - very much like `export` in JavaScript, so it can be used by other packages. `const` in Rust is different than `const` in JavaScript though. In Rust this is a real constant - a value which can't be changed. In JavaScript it is a constant _binding_ which means we can't assign another value to the same name (in this case our variable name is `HELLO_WORLD`). But the value itself can be changed, if it is a non-[primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) value. (E.g. `const a = { b: 1 }; a.b = 2;` is possible.) Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here by adding `&str` or we'll get compiler errors. Rust also supports type infering, but `const` _always_ requires an [explicit type annotation](https://doc.rust-lang.org/rust-by-example/custom_types/constants.html#constants). `&str` is pronounced as _string slice_ (and [as a reminder](../hello-world/README.md) `"Hello world!"` is pronounced as a _string literal_). Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples, but you can already see methods can be invoked in the same way as we do in JavaScript and that built-in types come with a couple of built-in methods (like `'hello'.toUpperCase()` in JavaScript for example).
 
 We only need to publish our new crate now. You need to login on [crates.io/](https://crates.io/) with your GitHub account to do so. If you've done that visit your [account settings](https://crates.io/me) to get your API key. Than call `cargo login` and pass your API key:
 
@@ -281,7 +317,9 @@ Before you can publish your crate you need to package it like this:
 $ cargo package
 ```
 
-Much like npm Cargo ignores all your directories and files in your `.gitignore`, too. That is fine. We don't need to ignore more files (or less) in this case. Now we only need to publish the crate like this:
+Much like npm Cargo ignores all your directories and files in your `.gitignore`, too. That is fine. We don't need to ignore more files (or less) in this case. (If you _do_ need to change that, you can modify your `Cargo.toml` [as explained in the documentation](https://doc.rust-lang.org/cargo/reference/manifest.html#the-exclude-and-include-fields-optional).)
+
+Now we only need to publish the crate like this:
 
 ```bash
 $ cargo publish
@@ -356,7 +394,7 @@ The `tsconfig.json` is just copy and pasted without modifications.
 
 We installed our dependencies, now we can use them like this:
 
-```typescript
+```ts
 import { HELLO_WORLD } from 'rfnd-hello-world';
 
 console.log(`Required "${HELLO_WORLD}".`);
@@ -399,6 +437,7 @@ fn main() {
     println!("Required: {}.", HELLO_WORLD);
 }
 ```
+
 Note that even though our external crate is called `rfnd-hello-world` we access it with `rfnd_hello_world`.
 
 As we use `HELLO_WORLD` just a single time we could also have written the example like this:
@@ -412,7 +451,6 @@ fn main() {
 ```
 
 If `rfnd_hello_world` would expose more than one constant we can use a syntax similar to ES2015 destructing.
-
 
 ```rust
 extern crate rfnd_hello_world;
@@ -437,6 +475,6 @@ Required "Hello world!".
 
 It works! :tada:
 
-______
+---
 
-← [prev](../setup/README.md) | [next](../read-files/README.md) →
+← [prev _"Hello World"_](../hello-world/README.md) | [next](../read-files/README.md) →

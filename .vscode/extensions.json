@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "bungcip.better-toml",
+    "esbenp.prettier-vscode",
+    "rust-lang.rust"
+  ]
+}

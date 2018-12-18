@@ -1,1 +1,5 @@
-The source code for this example lives in a dedicated repository: [node-hello-world](https://github.com/donaldpipowitch/node-hello-world).
+# rfnd-hello-world
+
+> This module exports a "Hello world!" string.
+
+This module is part of ["Rust for Node Developers"](https://github.com/Mercateo/rust-for-node-developers) project.

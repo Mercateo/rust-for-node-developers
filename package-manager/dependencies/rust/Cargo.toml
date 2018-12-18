@@ -2,6 +2,7 @@
 name = "use-hello-world"
 version = "0.1.0"
 publish = false
+edition = "2018"
 
 [dependencies]
 rfnd-hello-world = "1.0.0"

@@ -2,81 +2,66 @@
 
 ## Install Node and Rust
 
-I use Mac OS X 10.11 to write my examples. You probably have Node installed already, but just so we are on the same page we'll do it again together. The installation process is really simple. Just visit Nodes official site [nodejs.org](https://nodejs.org/en/) and download the installer for Node. At the time of writing the latest LTS (long time support!) version is [v4.4.5](https://nodejs.org/dist/v4.4.5/node-v4.4.5.pkg) and the latest stable version is [v6.2.1](https://nodejs.org/dist/v6.2.1/node-v6.2.1.pkg). I'll use v4.4.5 as the LTS release is often the lowest common denominator used by most library authors. A SemVer minor release happens about every _two weeks_.
+I use Mac OS X 10.14 to write my examples. You probably have Node installed already, but just so we are on the same page we'll do it again together. You can install a single Node version like I describe now or install a tool to manage multiple Node versions as I describe in the next section and which is my recommended way.
+
+The installation process is really simple. Just visit Nodes official site [nodejs.org](https://nodejs.org/en/) and download the installer for Node. At the time of writing the latest version with _long time support_ (short: _LTS_) is [v10.14.2](https://nodejs.org/dist/v10.14.2/node-v10.14.2.pkg) and the most _current_ version is [v11.4.0](https://nodejs.org/dist/v11.4.0/node-v11.4.0.pkg). I'll use v10.14.2, because the LTS release is often the lowest common denominator used by most library authors. A minor release happens about every _two weeks_ and you can find the release notes [in the Node blog](https://nodejs.org/en/blog/).
 
 ![official Node website](./node-site.png)
 
-If you write `node --version` in your terminal now you should see `v4.4.5` in your window:
+If you write `node --version` in your terminal you should see `v10.14.2` in your window:
 
 ```bash
 $ node --version
-v4.4.5
+v10.14.2
 ```
 
-Rusts installation process is equally simple. Just visit Rusts official site this time on [rust-lang.org](https://www.rust-lang.org/) and click the _Install_ button to download the installer for the last stable release. At the time of writing this is 1.9.0. A SemVer minor release happens about every _six weeks_. Currently there are no LTS releases. (Every minor release was backwards compatible as no major release has happened after 1.0 so far.)
+Rusts installation process is a little bit different. If you visit Rusts official site on [rust-lang.org](https://www.rust-lang.org/) and click on the _Install_ link in the header you'll not immediately see a link to install Rust, but to install a tool called `rustup`. While it is still possible to _just_ install Rust via an installer just as we did for Node, it is no longer the recommended way. So we go straight to the next section.
+
+Just as a small addition: At the time of writing the latest stable Rust version is 1.31.0. A minor release happens about every _six weeks_ and you can find the release notes [in the Rust blog](https://blog.rust-lang.org/). Currently there are no LTS releases like they can be seen in the Node world, because every minor release was backwards compatible as no major release has happened after 1.0 so far.
 
 ![official Rust website](./rust-site.png)
 
-If you write `rustc --version` in your terminal now you should see `rustc 1.9.0 (e4e8b6668 2016-05-18)` in your window:
-
-```bash
-$ rustc --version
-rustc 1.9.0 (e4e8b6668 2016-05-18)
-```
-
-The `c` after `rust` stands for _compiler_.
-
-I'll actually _not_ use Node and Rust this way, but use the setup explained in the next chapter to easily switch between multiple versions of Node and Rust.
-
 ## Manage multiple versions of Node and Rust
 
-If you use Node or Rust for more serious work chances are pretty high that you want to upgrade easily to new versions or switch between multiple old or new versions. You can do this for Node with a tool called [`nvm`](https://github.com/creationix/nvm) and for Rust with a tool called [`rustup`](https://github.com/rust-lang-nursery/rustup.rs). (Note: `rustup` is the follow-up project of `multirust`. Don't use `multirust` as it isn't maintained anymore.)
+If you use Node or Rust for more serious work chances are pretty high that you want to upgrade easily to new versions or switch back to an old version, if you open an old project. You can do this for Node with a tool called [`nvm`](https://github.com/creationix/nvm) and for Rust with the already mentioned [`rustup`](https://github.com/rust-lang-nursery/rustup.rs). While `rustup` is the officially recommended way to manage Rust, `nvm` is a community project.
 
 The installation process for both tools is very easy. To download and install `nvm` you just write this in your terminal:
 
 ```bash
-$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh | bash
+$ curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.11/install.sh | bash
 ```
 
 After that you need to close and reopen your terminal. Check if the installation was successful with `nvm --version`:
 
 ```bash
 $ nvm --version
-0.31.1
+0.33.11
 ```
 
-You can install a specific Node version with `nvm install` and passing a version like `v6.0.0`:
+You can install a specific Node version with `nvm install` and passing a version like `v10.14.2`:
 
 ```bash
-$ nvm install v6.0.0
+$ nvm install v10.14.2
 ```
 
-This will install `v6.0.0` and switch this version. You can manually switch between versions with `npm use` like this:
+This will install `v10.14.2` and switch this version. You can manually switch between versions with `npm use` like this:
 
 ```bash
 $ nvm use v4.4.5
 Now using node v4.4.5 (npm v2.15.5)
 ```
 
-You probably want to set a default version which will be used everytime you fire up your terminal. You can do this with `nvm alias default` and passing a version:
+If you want to set a default version which will be used everytime you fire up your terminal you can run `nvm alias default` and pass a version:
 
 ```bash
 $ nvm alias default v4.4.5
 default -> v4.4.5
 ```
 
-If you have Rust already installed - either because you followed the instructions in the previous chapter or because you installed it yourself anytime in the past - you must uninstall it now, so you can use `rustup`. Don't worry! This is easy. Just run this:
-
-```bash
-/usr/local/lib/rustlib/uninstall.sh
-```
-
-You actually get uninstall instructions for Rust if you try to install `rustup`. Just in case you use a different platform than mine.
-
 To download and install `rustup` you just write this in your terminal:
 
 ```bash
-curl https://sh.rustup.rs -sSf | sh
+$ curl https://sh.rustup.rs -sSf | sh
 ```
 
 You'll be prompted with three options after `rustup` was installed:
@@ -87,108 +72,99 @@ You'll be prompted with three options after `rustup` was installed:
 3) Cancel installation
 ```
 
-You can use `1` to install Rust now or `3` to stop here and check the `rustup` help and version (which I did).
+Just choose `1` to install Rust.
 
-You can verify if everything worked with `rustup --version`;
+```bash
+  stable installed - rustc 1.31.0 (abe02cefd 2018-12-04)
+
+
+Rust is installed now. Great!
+
+To get started you need Cargo's bin directory ($HOME/.cargo/bin) in your PATH
+environment variable. Next time you log in this will be done automatically.
+
+To configure your current shell run source $HOME/.cargo/env
+```
+
+`rustc` was installed now - that is the Rust compiler.
+
+You can verify if Rustup was installed correctly and which version you have that way:
 
 ```bash
 $ rustup --version
-rustup 0.1.12 (c6e430a 2016-05-12)
+rustup 1.16.0 (beab5ac2b 2018-12-06)
 ```
 
-Now you can install a specific Rust version with `rustup install` and passing a version like `1.9.0`:
+Now you can install a specific Rust version with `rustup install` and passing a version like `1.29.0`:
 
 ```bash
-$ rustup install 1.9.0
-info: syncing channel updates for '1.9.0-x86_64-apple-darwin'
+$ rustup install 1.29.0
+info: syncing channel updates for '1.29.0-x86_64-apple-darwin'
+info: latest update on 2018-09-13, rust version 1.29.0 (aa3ca1994 2018-09-11)
 info: downloading component 'rustc'
- 39.1 MiB /  39.1 MiB (100 %)   3.0 MiB/s ETA:   0 s
+ 57.7 MiB /  57.7 MiB (100 %)   2.1 MiB/s ETA:   0 s
 info: downloading component 'rust-std'
- 51.3 MiB /  51.3 MiB (100 %)   3.9 MiB/s ETA:   0 s
-info: downloading component 'rust-docs'
-  5.8 MiB /   5.8 MiB (100 %) 952.5 KiB/s ETA:   0 s
+ 45.8 MiB /  45.8 MiB (100 %)   2.4 MiB/s ETA:   0 s
 info: downloading component 'cargo'
-  2.6 MiB /   2.6 MiB (100 %) 732.3 KiB/s ETA:   0 s
+  3.3 MiB /   3.3 MiB (100 %)   2.3 MiB/s ETA:   0 s
+info: downloading component 'rust-docs'
+  8.2 MiB /   8.2 MiB (100 %)   3.6 MiB/s ETA:   0 s
 info: installing component 'rustc'
 info: installing component 'rust-std'
-info: installing component 'rust-docs'
 info: installing component 'cargo'
+info: installing component 'rust-docs'
 
-  1.9.0-x86_64-apple-darwin installed - rustc 1.9.0 (e4e8b6668 2016-05-18)
+  1.29.0-x86_64-apple-darwin installed - rustc 1.29.0 (aa3ca1994 2018-09-11)
 ```
 
-This installed version `1.9.0`, but you still need to activate it as your default version:
+This installed version `1.29.0`. If you want to choose a default version, run this:
 
 ```bash
-$ rustup default 1.9.0
-info: using existing install for '1.9.0-x86_64-apple-darwin'
-info: default toolchain set to '1.9.0-x86_64-apple-darwin'
+$ rustup default 1.29.0
+info: using existing install for '1.29.0-x86_64-apple-darwin'
+info: default toolchain set to '1.29.0-x86_64-apple-darwin'
 
-  1.9.0-x86_64-apple-darwin unchanged - rustc 1.9.0 (e4e8b6668 2016-05-18)
+  1.29.0-x86_64-apple-darwin unchanged - rustc 1.29.0 (aa3ca1994 2018-09-11)
 ```
 
-Now you can check the version of Rust like we did in the previous chapter:
+After we feel comfortable in switching Node and Rust versions with `nvm` and `rustup` we'll now switch to the following version and verify that we'll use the same versions across the whole tutorial:
 
 ```bash
+$ nvm alias default v10.14.2
+default -> v10.14.2
+$ node --version
+v10.14.2
+
+$ rustup default 1.31.0
+  1.31.0-x86_64-apple-darwin installed - rustc 1.31.0 (abe02cefd 2018-12-04)
 $ rustc --version
-rustc 1.9.0 (e4e8b6668 2016-05-18)
+rustc 1.31.0 (abe02cefd 2018-12-04)
 ```
-
-Note that `rustup` isn't just a version manager for Rust like `nvm` is a version manager for Node. It can do much more than that and enables you things like compiling your code [for other platforms](https://github.com/rust-lang-nursery/rustup.rs#cross-compilation).
 
 ## Setup VS Code as your IDE
 
-I used [WebStorm](https://www.jetbrains.com/webstorm/) as my IDE of choice for several years. It offered the best code completion for JavaScript projects, but this only worked thanks to a lot of indexing and analyzing which also made WebStorm quite slow. I followed all web-based editor projects (like [Brackets](http://brackets.io/) and [Atom](https://atom.io/)) very closely to find a lighter and extensible alternative to WebStorm and finally settled on [VS Code](https://code.visualstudio.com/). It has quite nice code completion for JavaScript (if you use JSDocs) and first-class code completion support for TypeScript projects which I use more often these days - thanks to VS Code!
-
-Currently there is no specific Rust IDE from JetBrains, the developers behind WebStorm, or any other _big_ IDE. However most IDEs and editors offer Rust support via plugins and extensions which need a little bit of configuration. This is what we do now!
+The IDE of my choice for Node and Rust projects is [VS Code](https://code.visualstudio.com/). It has awesome Typescript support as both projects are developed by Microsoft and their teams work closely together. But it also has awesome Rust support, as the _language server_ of Rust has an official reference implementation as a VS Code extension. (In case you're not familiar with the term _language server_: This is the piece of software which powers a lot of your typical IDE features like _code completion_ or _go to definition_.)
 
 First install VS Code, if you haven't already. Just visit [code.visualstudio.com](https://code.visualstudio.com/) and download the installer. The _Download_ button is in the upper right corner.
 
 ![official VS Code website](./vscode-site.png)
 
-On the following site you can choose between stable and insider releases. The insider releases offer new experimental features. I'll use the stable release which is version 1.1.1 at the time of writing.
+On the following site you can choose between stable and insider releases. The insider releases offer new experimental features. I'll use the stable release which is version 1.30.0 at the time of writing.
 
-![VS Code download page](./vscode-installer-site.png)
+If you open this project with VS Code you should see a small notification which asks to install all _recommended extensions_. This is a nice feature from VS Code which can be configured inside `.vscode/extensions.json`. Nevertheless - if you don't see the notification these are the extensions we want to install:
 
-Now we will install [Rusty Code](https://github.com/saviorisdead/RustyCode) the Rust extension for VS Code. Just open VS Code, press `⌘P` (Quick Open) and type `ext install RustyCode`. Click on _Rusty Code_.
+We need to install [Rust (rls)](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust) - the Rust extension for VS Code. Just open VS Code, press `⌘P` (Quick Open) and type `ext install ext install rust-lang.rust`. Press enter and reload VS Code. The extension should now be installed. As soon as you open an `.rs` file (the file extension used for Rust code) the Rust extension will ask you to install the corresponding language service, if you haven't installed it already. Just accept it and everything should work fine.
 
-After that we need to install [Racer](https://github.com/phildawes/racer). This is used by Rusty Code to get code completion for Rust. You can install Racer easily with Rusts package manager called Cargo, which was installed alongside with Rust. I'll introduce you to Cargo in more detail in the chapter about [package manager](../package-manager/README.md). For now you can install Racer with the following command:
+One caveat: In order to fully work you need to have a `Cargo.toml` file in the root of your project. I'll explain what a `Cargo.toml` is in the chapter [_"Package Manager"_](../package-manager/README.md), but for now you can think of it like a `package.json` for Rust packages and that [Cargo](https://crates.io/) is used to manage dependencies in your Rust project, just like [npm](https://www.npmjs.com/) in Node projects. (We can workaround this by using a feature called [_workspaces_](https://doc.rust-lang.org/book/ch14-03-cargo-workspaces.html), which is really similar to [yarn workspaces](https://yarnpkg.com/lang/en/docs/workspaces/), if you ever used [yarn](https://yarnpkg.com/en/) instead of npm to manage dependencies in a Node project, but it _shouldn't_ be necessary, in my opinion. [I raised this as a feature request for Rusts language service.](https://github.com/rust-lang/rls/issues/1198))
 
-```bash
-$ cargo install racer
-```
+But this brings us to the next VS Code extension we need: [Better TOML](https://marketplace.visualstudio.com/items?itemName=bungcip.better-toml), which supports syntax highlighting for `.toml` files. Open VS Code, press `⌘P` (Quick Open), type `ext install bungcip.better-toml` and press enter.
 
-Unlike npm the `install` command always installs packages _globally_ (e.g. to `~/.cargo`, if you used `rustup`) and only packages which are used as a command line tool.
+The Rust extension we installed earlier automatically supports formatting Rust files (by using a tool called [`rustfmt`](https://github.com/rust-lang/rustfmt)). Let's add the same functionality to our JavaScript and TypeScript files by installing an extension for the popular [_prettier_](https://prettier.io/). Open VS Code, press `⌘P` (Quick Open), type `ext install esbenp.prettier-vscode` and press enter.
 
-You also need [rustfmt](https://github.com/rust-lang-nursery/rustfmt) so Rusty Code can format your Rust code. We'll use Cargo for this, too:
+I like to format all my files _on every save_ (and I like to slighlty adjust the default prettier config), so I put a [`.vscode/settings.json`](.vscode/settings.json) in the root of our project. This file is automatically picked up by VS Code, so you use the same config as I do by default.
 
-```bash
-$ cargo install rustfmt
-```
+We could add even more tooling support now, for example to support linters. (In the Rust ecosystem exists a popular linter called [Clippy](https://github.com/rust-lang/rust-clippy) which has the same purpose as [ESLint](https://eslint.org/) in the Node world.) But I think we're ready to go now and finally write some code! 🎉
 
-My Racer version is 1.2.9 and my rustfmt version is 0.5.0.
+---
 
-As the last step we actually need the source code of Rust itself so Racer works properly. Just clone it somewhere in your workspace:
-
-```bash
-# e.g. $ cd ~/some-workspace
-$ git clone https://github.com/rust-lang/rust.git
-```
-
-Now add the following lines to your VS Code `settings.json` (available in _User Settings_ `⌘,`):
-
-```json
-{
-
-  "rust.rustLangSrcPath": "/Users/foo/some-workspace/rust/src",
-  "rust.formatOnSave": true
-}
-```
-
-Note that `foo` must be your user name. You have to use the full path beginning with `/Users` as `~` doesn't work. `some-workspace` should be the directory where you cloned the Rust source code. We also enable formatting on save which is disabled by default.
-
-Last but not least you'll want to install the [TOML extension](https://marketplace.visualstudio.com/items?itemName=be5invis.toml) for VS Code. `.toml` files serve as the configuration files in Rust projects, much like `.json` is used in the Node world. Just open VS Code, press `⌘P` (Quick Open) and type `ext install toml`. Click on _TOML Language Support_.
-
-______
-
-[next](../hello-world/README.md) →
+[next _"Hello World"_](../hello-world/README.md) →

@@ -4,11 +4,11 @@
 
 In our [last example](../read-files/README.md) we used `readFile` to read the content of a file and switched to a combination of `openSync` and `readSync` to achieve the same goal in a low-level manner and synchronous way to make it easier comparable to Rust. Now we switch to `readFileSync` to keep things easier. We reuse our basic project structure with typings for this.
 
-In this example we want to read two files: `hello.txt` and `world.txt`. They contain just a single word - `Hello` and `world`. We concatenate the content of both files and write it into a new file `hello-world.txt`. Its contain should be `Hello world!` at the end. (The ` ` and the `!` will be added by us.)
+In this example we want to read two files: `hello.txt` and `world.txt`. They contain just a single word - `Hello` and `world`. We concatenate the content of both files and write it into a new file `hello-world.txt`. Its contain should be `Hello world!` at the end. (The `` and the `!` will be added by us.)
 
 The program could look like this:
 
-```typescript
+```ts
 import { readFileSync, writeFileSync } from 'fs';
 
 let hello;
@@ -38,7 +38,7 @@ console.log(`Wrote file 'hello-world.txt' with content: ${helloWorld}`);
 
 You'll note that we switched our error handling style from something like that:
 
-```typescript
+```ts
 let foo;
 try {
   foo = doFooSync();
@@ -50,7 +50,7 @@ try {
 
 To something like that:
 
-```typescript
+```ts
 let foo;
 try {
   foo = doFooSync();
@@ -64,7 +64,7 @@ It does _roughly_ the same. We throw a new error with a custom error message and
 Before looking into Rust we should test our program:
 
 ```bash
-$ npm start -s
+$ npm -s start
 Wrote file in hello-world.txt with content: Hello world!
 ```
 
@@ -171,7 +171,7 @@ I definitely need to get used to writing _implicit returns_ like that even if I 
 We should check that everything works:
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Content is: Hello
 Content is: world
 ```
@@ -430,12 +430,12 @@ We create a new function with `fn` called `write_file`. `write_file` accepts two
 Let's try our program:
 
 ```bash
-$ cargo run -q
+$ cargo -q run
 Wrote file 'hello-world.txt' with content: Hello world!
 ```
 
 Awesome! In this example your learned different error handling patterns, different ways to concatenate a string and how to write a file.
 
-______
+---
 
-← [prev](../read-files/README.md) | [next](../http-requests/README.md) →
+← [prev _"Read files"_](../read-files/README.md) | [next _"HTTP requests"_](../http-requests/README.md) →

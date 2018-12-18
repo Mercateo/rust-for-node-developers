@@ -1,0 +1,5 @@
+{
+  "editor.formatOnSave": true,
+  "prettier.arrowParens": "always",
+  "prettier.singleQuote": true
+}

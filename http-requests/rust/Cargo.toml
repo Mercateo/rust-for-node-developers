@@ -2,6 +2,7 @@
 name = "http-requests"
 version = "1.0.0"
 publish = false
+edition = "2018"
 
 [dependencies]
 hyper = "0.9.0"

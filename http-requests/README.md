@@ -8,7 +8,7 @@ Because GitHubs API is served over `https` we'll use Node's `https` module. We c
 
 So this is our basic example:
 
-```typescript
+```ts
 import { get } from 'https';
 
 const host = 'api.github.com';
@@ -16,9 +16,11 @@ const path = '/users/donaldpipowitch';
 
 get({ host, path }, (res) => {
   let buf = '';
-  res.on('data', (chunk) => buf = buf + chunk);
+  res.on('data', (chunk) => (buf = buf + chunk));
   res.on('end', () => console.log(`Response: ${buf}`));
-}).on('error', (err) => { throw `Couldn't send request.` });
+}).on('error', (err) => {
+  throw `Couldn't send request.`;
+});
 ```
 
 We import the `get` function from `https`. We declare a `host` and `path` (no need to set the protocol, when we already use the `https` module). After that we call `get` and pass an options object (containing our `host` and `path`) and callback whic accepts a response object (`res`) as the _first_ parameter. Yes, `get` doesn't follow the usual callback style pattern of Node where the first param is an error and the second param is a result. It is more low level than that. Instead we have an request object (the return value of `get`) and an response object (`res`) which are both event emitters. We listen for `error` events on the request object and in case of an error we just `throw` `Couldn't send request.` to exit our program.
@@ -66,7 +68,7 @@ get({ host, path }, (res) => {
 +    }
 +  });
 }).on('error', (err) => { throw `Couldn't send request.` });
-````
+```
 
 Test the program again:
 
@@ -240,7 +242,7 @@ After that we read our result into a buffer (`buf`) and print the response body.
 If you run our program now you see the same error as in our first Node example:
 
 ```
-$ cargo run -q
+$ cargo -q run
 Response: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
 ```
 
@@ -278,7 +280,7 @@ Note that we use an `if` statement in Rust for the first time. Unlike JavaScript
 Test the program again:
 
 ```
-$ cargo run -q
+$ cargo -q run
 Response: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
 
 thread '<main>' panicked at 'Got client error: 403 Forbidden', src/main.rs:50
@@ -332,12 +334,12 @@ We import `Headers` and `UserAgent` from `hyper::header`. We create a new instan
 The last thing we need to do is passing our `headers` to our actually request with the `headers` method, just before we call `send`. Done!
 
 ```
-$ cargo run -q
+$ cargo -q run
 Response: {"login":"donaldpipowitch","id":1152805, ...
 ```
 
 The Node and the Rust example both show the same result now. Nice. In the next example I'll show you how to actually handle a JSON response.
 
-______
+---
 
-← [prev](../write-files/README.md) | [next](../parse-json/README.md) →
+← [prev _"Write files"_](../write-files/README.md) | [next _"Parse JSON"_](../parse-json/README.md) →

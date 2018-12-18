@@ -7,7 +7,7 @@
   ],
   "private": true,
   "description": "This is just a demo.",
-  "license": "(MIT OR Apache-2.0)",
+  "license": "MIT OR Apache-2.0",
   "keywords": [
     "demo",
     "test"
@@ -20,6 +20,6 @@
   "bugs": "https://github.com/john.doe/hello-world/issues",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src"
+    "start": "node src/index.js"
   }
 }
