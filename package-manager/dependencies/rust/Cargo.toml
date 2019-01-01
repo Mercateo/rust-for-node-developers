@@ -5,4 +5,4 @@ publish = false
 edition = "2018"
 
 [dependencies]
-rfnd-hello-world = "1.0.0"
+rfnd-hello-world = "1.0.1"

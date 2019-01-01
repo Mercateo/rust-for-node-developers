@@ -1,12 +1,14 @@
-[root]
+[[package]]
+name = "rfnd-hello-world"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
 name = "use-hello-world"
 version = "0.1.0"
 dependencies = [
- "rfnd-hello-world 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "rfnd-hello-world 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
-[[package]]
-name = "rfnd-hello-world"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-
+[metadata]
+"checksum rfnd-hello-world 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "f3a3c0501ca84498b0327925c8eba1e18aed8d5c3a08afcbd825c9de01324bc9"

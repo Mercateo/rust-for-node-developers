@@ -6,12 +6,12 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "start": "npm run build && node dist",
-    "build": "tsc"
+    "build": "tsc --build src"
   },
   "devDependencies": {
-    "typescript": "^1.8.10"
+    "typescript": "^3.2.2"
   },
   "dependencies": {
-    "rfnd-hello-world": "^1.0.0"
+    "rfnd-hello-world": "^1.0.1"
   }
 }
