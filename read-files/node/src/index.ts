@@ -1,31 +1,31 @@
-import { openSync, readSync, fstatSync } from 'fs';
+import { openSync, readSync, fstatSync, Stats } from 'fs';
 
-let file;
+let fileDescriptor: number;
 try {
-  file = openSync('hello.txt', 'r');
+  fileDescriptor = openSync('hello.txt', 'r');
 } catch (err) {
   console.log(`Couldn't open: ${err.message}`);
   process.exit(1);
 }
 
-let stat;
+let stat: Stats;
 try {
-  stat = fstatSync(file);
+  stat = fstatSync(fileDescriptor);
 } catch (err) {
   console.log(`Couldn't get stat: ${err.message}`);
   process.exit(1);
 }
 
-const buffer = new Buffer(stat.size);
+const buffer = Buffer.alloc(stat.size);
 
 try {
-  readSync(file, buffer, 0, stat.size, null);
+  readSync(fileDescriptor, buffer, 0, stat.size, null);
 } catch (err) {
   console.log(`Couldn't read: ${err.message}`);
   process.exit(1);
 }
 
-let data;
+let data: string;
 try {
   data = buffer.toString();
 } catch (err) {
