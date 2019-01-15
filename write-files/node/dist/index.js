@@ -1,5 +1,6 @@
 "use strict";
-var fs_1 = require('fs');
+exports.__esModule = true;
+var fs_1 = require("fs");
 var hello;
 try {
     hello = fs_1.readFileSync('hello.txt', 'utf8');
@@ -21,5 +22,5 @@ try {
 catch (err) {
     throw "Couldn't write 'hello-world.txt'.";
 }
-console.log("Wrote file in hello-world.txt with content: " + helloWorld);
+console.log("Wrote file 'hello-world.txt' with content: " + helloWorld);
 //# sourceMappingURL=index.js.map

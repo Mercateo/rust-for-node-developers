@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "outDir": "../dist",
+    "declaration": true,
+    "sourceMap": true,
+    "declarationMap": true
+  }
+}
