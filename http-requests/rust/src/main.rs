@@ -1,72 +1,39 @@
-extern crate hyper;
-
-use std::io::Read;
-use hyper::Client;
-use hyper::header::{Headers, UserAgent};
+use hyper::rt::{run, Future, Stream};
+use hyper::{Client, Request};
+use hyper_tls::HttpsConnector;
+use std::str::from_utf8;
 
 fn main() {
-    let url = "https://api.github.com/users/donaldpipowitch";
-
-    let mut headers = Headers::new();
-    headers.set(UserAgent("Mercateo/rust-for-node-developers".to_string()));
-
-    let client = Client::new();
-    let mut res = client.get(url)
-        .headers(headers)
-        .send()
-        .expect("Couldn't send request.");
-
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
-    println!("Response: {}", buf);
-
-    if res.status.is_client_error() {
-        panic!("Got client error: {}", res.status);
-    }
-    if res.status.is_server_error() {
-        panic!("Got server error: {}", res.status);
-    }
+    run(get());
 }
 
-// ---
+fn get() -> impl Future<Item = (), Error = ()> {
+    // 4 is number of blocking DNS threads
+    let https = HttpsConnector::new(4).unwrap();
 
-// extern crate hyper;
+    let client = Client::builder().build(https);
 
-// use std::io::Read;
-// use hyper::Client;
+    let req = Request::get("https://api.github.com/users/donaldpipowitch")
+        .header("User-Agent", "Mercateo/rust-for-node-developers")
+        .body(hyper::Body::empty())
+        .unwrap();
 
-// fn main() {
-//     let url = "https://api.github.com/users/donaldpipowitch";
+    client
+        .request(req)
+        .and_then(|res| {
+            let status = res.status();
 
-//     let client = Client::new();
-//     let mut res = client.get(url).send().expect("Couldn't send request.");
+            let buf = res.into_body().concat2().wait().unwrap();
+            println!("Response: {}", from_utf8(&buf).unwrap());
 
-//     let mut buf = String::new();
-//     res.read_to_string(&mut buf).expect("Couldn't read response.");
-//     println!("Response: {}", buf);
+            if status.is_client_error() {
+                panic!("Got client error: {}", status.as_u16());
+            }
+            if status.is_server_error() {
+                panic!("Got server error: {}", status.as_u16());
+            }
 
-//     if res.status.is_client_error() {
-//         panic!("Got client error: {}", res.status);
-//     }
-//     if res.status.is_server_error() {
-//         panic!("Got server error: {}", res.status);
-//     }
-// }
-
-// ---
-
-// extern crate hyper;
-
-// use std::io::Read;
-// use hyper::Client;
-
-// fn main() {
-//     let url = "https://api.github.com/users/donaldpipowitch";
-
-//     let client = Client::new();
-//     let mut res = client.get(url).send().expect("Couldn't send request.");
-
-//     let mut buf = String::new();
-//     res.read_to_string(&mut buf).expect("Couldn't read response.");
-//     println!("Response: {}", buf);
-// }
+            Ok(())
+        })
+        .map_err(|_err| panic!("Couldn't send request."))
+}

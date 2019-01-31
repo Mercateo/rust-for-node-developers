@@ -13,69 +13,71 @@ const host = 'api.github.com';
 -const path = '/users/donaldpipowitch';
 +const path = '/users/donaldpipowitch/repos';
 
-function isClientError(statusCode) {
+function isClientError(statusCode: number) {
   return statusCode >= 400 && statusCode < 500;
 }
 
-function isServerError(statusCode) {
+function isServerError(statusCode: number) {
   return statusCode >= 500;
 }
 
 const headers = {
-  'user-agent': 'Mercateo/rust-for-node-developers'
+  'User-Agent': 'Mercateo/rust-for-node-developers'
 };
 
-+interface Repository {
++type Repository = {
 +  name: string;
-+  description: string;
++  description: string | null;
 +  fork: boolean;
-+}
++};
 
 get({ host, path, headers }, (res) => {
   let buf = '';
-  res.on('data', (chunk) => buf = buf + chunk);
+  res.on('data', (chunk) => (buf = buf + chunk));
 
   res.on('end', () => {
 -    console.log(`Response: ${buf}`);
 
     if (isClientError(res.statusCode)) {
-      throw `Got client error: ${res.statusCode}`
+      throw `Got client error: ${res.statusCode}`;
     }
     if (isServerError(res.statusCode)) {
-      throw `Got server error: ${res.statusCode}`
+      throw `Got server error: ${res.statusCode}`;
     }
 
-+    const repositories: Array<Repository> = JSON.parse(buf)
-+      .map(({ name, description, fork }) => ({ name, description, fork }));
-+    console.log(`Result is:\n`, repositories);
++    const repositories: Repository[] = JSON.parse(buf).map(
++      ({ name, description, fork }) => ({ name, description, fork })
++    );
++    console.log('Result is:\n', repositories);
   });
-}).on('error', (err) => { throw `Couldn't send request.` });
-
+}).on('error', (err) => {
+  throw `Couldn't send request.`;
+});
 ```
 
-Our raw response which is stored in `buf` can be easily parsed with the global `JSON` object and its `parse` method. After that we `map` over the returned array to extract just the `name`, `description` and `fork` fields. (The actual response has much more data!) Note that we only _assume_ that `JSON.parse(buf)` returns an array. We are optimistic here, because we think we know the GitHub API, but to be really save, we should check if our parsed response actually is an array. We _assume_ that `name`, `description` and `fork` exist and are strings or booleans, too! Again this is somehow optimistic. GitHub could send us different data. It is up to you as a developer to decide how many safety checks you want to make here. Is this a critical part of your application? How much do you trust GitHub and there API contract?
+Our raw response which is stored in `buf` can be easily parsed with the global `JSON` object and its `parse` method. After that we `map` over the returned array to extract just the `name`, `description` and `fork` fields. (The actual response has much more data!) Note that we only _assume_ that `JSON.parse(buf)` returns an array. We are optimistic here, because we think we know the GitHub API, but to be really save, we should check if our parsed response actually is an array. We _assume_ that `name`, `description` and `fork` exist and are strings, booleans or maybe `null` in case of the `description`, too! Again this is somehow optimistic. GitHub could send us different data. It is up to you as a developer to decide how many safety checks you want to make here. Is this a critical part of your application? How much do you trust GitHub and there API contract?
 
-We added an `interface` called `Repository` to describe our response format. The parsed response has the type `Array<Repository>` and is saved in `repositories`. It is _not mandatory_ to tell TypeScript the type of `repositories` in this case, but it would make further usage of `repositories` easier and safer, because TypeScript would check incorrect usage of `repositories`.
+We also added a `type` called `Repository` to describe our response format. The parsed response has the type `Repository[]` (which means it is an array containing `Repository`'s and can also be written as `Array<Repository>`) and is saved in `repositories`. It is _not mandatory_ to tell TypeScript the type of `repositories` in this case, but it would make further usage of `repositories` easier and safer, because TypeScript would check incorrect usage of `repositories` now. Without adding the type explicitly TypeScript would default to treat `respositories` as [`any`](https://www.typescriptlang.org/docs/handbook/basic-types.html#any) which would result in doing no type checks at all when we use `repositories`.
 
-For this example it is sufficient not do more checks. Let us test our program:
+For the scope of this example it is sufficient not do more runtime checks. Let us test our program:
 
 ```
 $ npm run -s start
 Result is:
- [ { name: 'ajv',
-    description: 'The fastest JSON schema Validator. Supports v5 proposals',
+ [ { name: 'afpre',
+    description: ' CLI for the AWS Federation Proxy',
     fork: true },
-  { name: 'angular',
-    description: 'Code to optimize AngularJS for complex pages',
+  { name: 'ajv',
+    description: 'The fastest JSON schema Validator. Supports v5 proposals',
     fork: true },
   ...
 ```
 
-It works! Nothing complicated and you probably have done this a thousand time, if you're a JavaScript developer.
+It works! Nothing complicated and you probably have done this a thousand times, if you use APIs regularly.
 
 ## Rust
 
-Parsing JSON is a little bit trickier currently in Rust. The state of art way of deserializing a string to JSON is by using the [`serde`](https://github.com/serde-rs/serde) and [`serde_json`](https://github.com/serde-rs/json) crates. But to do that ergonomically we also need [`serde_macros`](https://github.com/serde-rs/serde/tree/master/serde_macros).
+The state of art way of deserializing a string to JSON is by using the [`serde`](https://github.com/serde-rs/serde) and [`serde_json`](https://github.com/serde-rs/json) crates.
 
 Add all three crates to your `Cargo.toml`:
 
@@ -87,146 +89,121 @@ version = "1.0.0"
 publish = false
 
 [dependencies]
-hyper = "0.9"
-+serde = "0.8"
-+serde_macros = "0.8"
-+serde_json = "0.8"
+hyper = "0.12.21"
+hyper-tls = "0.3.1"
++serde = { version = "1.0", features = ["derive"] }
++serde_json = "1.0"
 ```
 
-Sadly there is one more step involved to parse JSON with `serde`. We need to switch to a nightly build of Rust. At least for now. I'll tell you in a minute why. Just install nightly with [`rustup`](../setup/README.md).
+What you see here is the possibility to configure a single crate within the `Cargo.toml`. In this case we enabled a feature called `derive` for `serde` which isn't enabled by default. This allows us to automatically deserialize a JSON string into a custom `struct`.
 
-```bash
-$ rustup install nightly
-...
-  nightly-x86_64-apple-darwin installed - rustc 1.13.0-nightly (923bac459 2016-09-06)
-```
-
-If you want to you can make nightly your new default. It has some unstable features, but nicer error messages. You do it that way:
-
-```bash
-$ rustup default nightly
-info: using existing install for 'nightly-x86_64-apple-darwin'
-info: default toolchain set to 'nightly-x86_64-apple-darwin'
-
-  nightly-x86_64-apple-darwin unchanged - rustc 1.13.0-nightly (923bac459 2016-09-06)
-```
-
-So why do we need nightly here? We want to use a Rust feature called [_attributes_](https://doc.rust-lang.org/book/attributes.html). Attributes change the _meaning of an item_ to which they are applied. An item can be a struct declaration for example. They are written as `#[test]` or `#![test]`. `#[test]` would be applied to the _next_ item and `#![test]` would be applied to the _enclosing_ item. E.g.:
+We do this with a language construct called [_attributes_](https://doc.rust-lang.org/reference/attributes.html). Attributes change the _meaning of an item_ to which they are applied. An item can be a struct declaration for example. They are written as `#[test]` or `#![test]`. `#[test]` would be applied to the _next_ item and `#![test]` would be applied to the _enclosing_ item. E.g.:
 
 ```rust
-#[foo]
-struct Foo;
+#[hello]
+struct SomeStruct;
 
-mod bar {
-    #![bar]
+fn some_function() {
+    #![world]
 }
 ```
 
 We can pass additional data to attributes (`#[inline(always)]`) or keys and values (`#[cfg(target_os = "macos")]`).
 
-For now _every_ attribute is defined by the Rust compiler and we want to use an attribute called `derive` which is only available in nightlies. `derive` allows us to automatically implement certain traits for a custom struct. The trait we're interested in is [`Deserialize`](https://docs.serde.rs/serde/de/trait.Deserialize.html) from... you guessed it: `serde`!
+The attribute we are interested in is called `derive`. It automatically implements certain traits to a custom data structure (in this case a `struct`). The trait we want to derive is called `Deserialize` from the `serde` carte. We'll also derive the build-in `Debug` trait, so we can `println!` our `struct`. A custom `struct` can be created with the `struct` keyword. In our case it has three fields: `name` (which is a `string`), `fork` (which is a `bool`) and `description` (which _maybe_ is a `string`). To express a potentially unavailable value we can use `Option`. `Option` is a little bit like `Result` in the sense that it shows two possible outcomes: `Result` has the successful (`Ok`) and failured (`Err`) cases while `Option` either has _no_ value (the `None` case) or it _has_ a value (the `Some` case).
 
-Let us look at modified [Rust example](../http-requests/README.md) :
+Having that said this is how we define our custom `struct` called `Repository`:
+
+```rust
+#[derive(Deserialize, Debug)]
+struct Repository {
+    name: String,
+    description: Option<String>,
+    fork: bool,
+}
+```
+
+Let's add that to the example from the [previous chapter](../http-requests/README.md) and also parse our string:
 
 ```diff
-+#![feature(custom_derive, plugin)]
-+#![plugin(serde_macros)]
-
-extern crate hyper;
-+extern crate serde_json;
-
-use std::io::Read;
-use hyper::Client;
-use hyper::header::{Headers, UserAgent};
-+use serde_json::from_str;
+use hyper::rt::{run, Future, Stream};
+use hyper::{Client, Request};
+use hyper_tls::HttpsConnector;
++use serde::Deserialize;
+use std::str::from_utf8;
 
 +#[derive(Deserialize, Debug)]
 +struct Repository {
 +    name: String,
-+    description: Option<String>, // description is an Option<String> here, as it is optional field in github repos and might return null in JSON
++    description: Option<String>,
 +    fork: bool,
 +}
 
 fn main() {
--    let url = "https://api.github.com/users/donaldpipowitch";
-+    let url = "https://api.github.com/users/donaldpipowitch/repos";
+    run(get());
+}
 
-    let mut headers = Headers::new();
-    headers.set(UserAgent("Mercateo/rust-for-node-developers".to_string()));
+fn get() -> impl Future<Item = (), Error = ()> {
+    // 4 is number of blocking DNS threads
+    let https = HttpsConnector::new(4).unwrap();
 
-    let client = Client::new();
-    let mut res = client.get(url)
-        .headers(headers)
-        .send()
-        .expect("Couldn't send request.");
+    let client = Client::builder().build(https);
 
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
--    println!("Response: {}", buf);
+-    let req = Request::get("https://api.github.com/users/donaldpipowitch/repos")
++    let req = Request::get("https://api.github.com/users/donaldpipowitch/repos")
+        .header("User-Agent", "Mercateo/rust-for-node-developers")
+        .body(hyper::Body::empty())
+        .unwrap();
 
-    if res.status.is_client_error() {
-        panic!("Got client error: {}", res.status);
-    }
-    if res.status.is_server_error() {
-        panic!("Got server error: {}", res.status);
-    }
+    client
+        .request(req)
+        .and_then(|res| {
+            let status = res.status();
 
-+    let repositories: Vec<Repository> = from_str(&buf).expect("Couldn't parse response.");
-+    println!("Result is:\n{:?}", repositories);
+-            let buf = res.into_body().concat2().wait().unwrap();
+-            println!("Response: {}", from_utf8(&buf).unwrap());
+
+            if status.is_client_error() {
+                panic!("Got client error: {}", status.as_u16());
+            }
+            if status.is_server_error() {
+                panic!("Got server error: {}", status.as_u16());
+            }
+
++            let buf = res.into_body().concat2().wait().unwrap();
++            let json = from_utf8(&buf).unwrap();
++            let repositories: Vec<Repository> = serde_json::from_str(&json).unwrap();
++            println!("Result is:\n{:#?}", repositories);
+
+            Ok(())
+        })
+        .map_err(|_err| panic!("Couldn't send request."))
 }
 ```
 
-First we enable two compiler features (`custom_derive` and `plugin`) with `#![feature(custom_derive, plugin)]`. These are needed to use the compiler plugin of `serde_macros`. [Compiler plugins](https://doc.rust-lang.org/book/compiler-plugins.html) can extend Rusts compiler behavior with syntax extensions, linter checks and so on. The plugin is loaded in the next line with `#![plugin(serde_macros)]`.
+Two new things can be seen here.
 
-We import `serde_json` and its `from_str` function, which will decode our JSON from our `buf` string.
+We used the `Vec` type here, because we get multiple `Repository`'s from the response. ([Remember](../read-files/README.md) that we already used the `vec!` macro which created a `Vec`.)
 
-We declare our `Repository` struct and its fields. The struct has the following attribute attached to it: `#[derive(Deserialize, Debug)]`. We derive `Deserialize` which will handle the deserialization of our JSON into our struct. But what is `Debug` and where does it come from? So far when we logged a value we used the `println!` macro like this: `println!("Log: {}", foo);`. To do that `foo` actually needs to implement the [`fmt::Display`](https://doc.rust-lang.org/stable/std/fmt/trait.Display.html). Coming from a JavaScript background you can think of implementing the `Display` trait as providing a nicely formatted `toString` on custom data structures. But what is `Debug` now? It is the [`fmt::Debug`](https://doc.rust-lang.org/stable/std/fmt/trait.Debug.html) trait. `Debug` is more generic than `Format` and can be _automatically_ derived for a struct if all of its fields implement `Debug`. That's why we use it here. It is an easy we to log custom structs. The usage with `println!` is just a little bit different. You use `{:?}` instead of just `{}`. That's it!
-
-Having our `Repository` struct and its attributes setup correctly everything boils down to these two lines:
-
-```rust
-let repositories: Vec<Repository> = from_str(&buf).expect("Couldn't parse response.");
-println!("Result is:\n{:?}", repositories);
-```
-
-We call `from_str` and pass our `buf` as a reference. `from_str` will try to parse our response as `Vec<Repository>`. If everything works without an error, we log `repositories` with `println!("Result is:\n{:?}", repositories);`. (Note the usage of `{:?}`.)
-
-Run it now and you should see this:
+The other new thing is the usage of `{:#?}` inside `println!`. So far when we logged a value we used the `println!` macro like this: `println!("Log: {}", some_value);`. To do that `some_value` actually needs to implement the [`Display`](https://doc.rust-lang.org/stable/std/fmt/trait.Display.html) trait. Coming from a JavaScript background you can think of implementing the `Display` trait as providing a nicely formatted `toString` on custom data structures. Sadly `Display` can't be derived automatically. But when all fields in a struct implement `Debug`, we can derive it automatically for custom structs. That's why we use it here. It is an easy way to log custom structs. The usage with `println!` is just a little bit different. You use `{:?}` instead of just `{}`. And if you use `{:#?}` the output will be _pretty printed_. (If you're curious the [string formatting](https://doc.rust-lang.org/std/fmt/index.html) in Rust allows you to do even more cool things, like printing numbers with leading zeros.)
+Let us try our program:
 
 ```bash
 $ cargo -q run
 Result is:
-[Repository { name: "ajv", description: Some("The fastest JSON schema Validator. Supports v5 proposals"), fork: true }, Repository { name: "angular", description: Some("Code to optimize AngularJS for complex pages"), fork: true }, ...]
-```
-
-You see that our `Vec<Repository>` is printed with `{:?}` in the format `[Repository { name, description, fork }, ...]`. Thanks to `#[derive(Debug)]`! Notice that `description` has a form of `Some(...)` - in the corresponding struct it was declared as an `Option<String>`, because the description field is optional and non-required on every github repo.
-
-But that is not all: The [string formatting](https://doc.rust-lang.org/nightly/std/fmt/index.html) in Rust allow you to do a bunch of really cool things, e.g., padding inputs to a certain length or choosing representations for numbers. One of the most amazing features is the "alternate mode", which you can trigger with an `#`. The alternate mode for `Debug` is to pretty-print the data, so it gets split up in lines and is nicely indented!
-
-If we change our `println` to
-
-```rust
-println!("Result is:\n{:#?}", repositories);
-//                      ^-- added a `#` here
-```
-
-it will now output our data like this:
-
-```bash
-$ cargo -q run
 Result is:
 [
     Repository {
-        name: "ajv",
+        name: "afpre",
         description: Some(
-          "The fastest JSON schema Validator. Supports v5 proposals"
+            " CLI for the AWS Federation Proxy"
         ),
         fork: true
     },
     Repository {
-        name: "angular",
+        name: "ajv",
         description: Some(
-          "Code to optimize AngularJS for complex pages"
+            "The fastest JSON schema Validator. Supports v5 proposals"
         ),
         fork: true
     },
@@ -234,9 +211,9 @@ Result is:
 ]
 ```
 
-Phew. A lot of new concepts and unstable features to parse JSON in an ergonomic way. But it _is_ ergonomic and powerful, if you use these features.
+Nice. Applaud yourself. You really learned a lot.
 
-I guess as a JavaScript developers you just need to get comfortable to move more work to the Rust compiler, so you can work more declarative using attributes in Rust.
+Thank you for reading my articles so far. If you liked them, please let me know. With a little bit of luck I'm able to add new chapters in the future. Maybe about generating WASM and using it in Node Modules? Would you like that? Until then, have a nice day! 👋
 
 ---
 

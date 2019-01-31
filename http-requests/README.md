@@ -23,7 +23,7 @@ get({ host, path }, (res) => {
 });
 ```
 
-We import the `get` function from `https`. We declare a `host` and `path` (no need to set the protocol, when we already use the `https` module). After that we call `get` and pass an options object (containing our `host` and `path`) and callback whic accepts a response object (`res`) as the _first_ parameter. Yes, `get` doesn't follow the usual callback style pattern of Node where the first param is an error and the second param is a result. It is more low level than that. Instead we have an request object (the return value of `get`) and an response object (`res`) which are both event emitters. We listen for `error` events on the request object and in case of an error we just `throw` `Couldn't send request.` to exit our program.
+We import the `get` function from `https`. We declare a `host` and `path` (no need to set the protocol, when we already use the `https` module). After that we call `get` and pass an options object (containing our `host` and `path`) and callback which accepts a response object (`res`) as the _first_ parameter. Yes, `get` doesn't follow the usual callback style pattern of Node where the first param is an error and the second param is a result. It is more low level than that. Instead we have an request object (the return value of `get`) and an response object (`res`) which are both event emitters. We listen for `error` events on the request object and in case of an error we just `throw` `Couldn't send request.` to exit our program.
 
 We listen for `data` events on the response object and collect every new `chunk` of data in a string called `buf`. In the case of an `end` event on the response object we know we have our whole response body and log `buf`.
 
@@ -36,7 +36,7 @@ Response: Request forbidden by administrative rules. Please make sure your reque
 
 What's going on here? It turns out that we need to set a _user agent_ in our HTTP headers so GitHub allows us to a `GET` on its API. If you follow the link in the error you can read that the user agent should be the name of our GitHub account or the name of our app.
 
-But there's more. This response is actually an _error_, because its status code is `403`. But it was not catched by our `error` event listener. Why? The `error` event listener is only called when our request couldn't be made. In this case we _could_ make a request. The request worked correctly in technical terms. But the _server said_ that our request contains errors (the missing user agent). We need to manually throw client or server errors, if we are interested in them. Let's do that before we add a user agent. To do so I introduce two small helper functions:
+But there's more. This response is actually an _error_, because its status code is `403`. But it was not catched by our `error` event listener. Why? The `error` event listener is only called when our request couldn't be made. In this case we actually _made_ a request. The request worked correctly in technical terms. But the _server said_ that our request contains errors (the missing user agent). We need to manually throw client or server errors, if we are interested in them. Let's do that before we add a user agent. To do so I introduce two small helper functions:
 
 ```diff
 import { get } from 'https';
@@ -44,11 +44,11 @@ import { get } from 'https';
 const host = 'api.github.com';
 const path = '/users/donaldpipowitch';
 
-+function isClientError(statusCode) {
++function isClientError(statusCode: number) {
 +  return statusCode >= 400 && statusCode < 500;
 +}
 
-+function isServerError(statusCode) {
++function isServerError(statusCode: number) {
 +  return statusCode >= 500;
 +}
 
@@ -61,13 +61,15 @@ get({ host, path }, (res) => {
 +    console.log(`Response: ${buf}`);
 +
 +    if (isClientError(res.statusCode)) {
-+      throw `Got client error: ${res.statusCode}`
++      throw `Got client error: ${res.statusCode}`;
 +    }
 +    if (isServerError(res.statusCode)) {
-+      throw `Got server error: ${res.statusCode}`
++      throw `Got server error: ${res.statusCode}`;
 +    }
 +  });
-}).on('error', (err) => { throw `Couldn't send request.` });
+}).on('error', (err) => {
+  throw `Couldn't send request.`;
+});
 ```
 
 Test the program again:
@@ -77,7 +79,7 @@ $ npm run -s start
 Response: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
 
 
-/Users/donaldpipowitch/Workspace/rust-for-node-developers/http-requests/node/dist/index.js:42
+/Users/pipo/workspace/rust-for-node-developers/http-requests/node/dist/index.js:21
             throw "Got client error: " + res.statusCode;
             ^
 Got client error: 403
@@ -93,34 +95,36 @@ import { get } from 'https';
 const host = 'api.github.com';
 const path = '/users/donaldpipowitch';
 
-function isClientError(statusCode) {
+function isClientError(statusCode: number) {
   return statusCode >= 400 && statusCode < 500;
 }
 
-function isServerError(statusCode) {
+function isServerError(statusCode: number) {
   return statusCode >= 500;
 }
 
 +const headers = {
-+  'user-agent': 'Mercateo/rust-for-node-developers'
++  'User-Agent': 'Mercateo/rust-for-node-developers'
 +};
 
 -get({ host, path }, (res) => {
 +get({ host, path, headers }, (res) => {
   let buf = '';
-  res.on('data', (chunk) => buf = buf + chunk);
+  res.on('data', (chunk) => (buf = buf + chunk));
 
   res.on('end', () => {
     console.log(`Response: ${buf}`);
 
     if (isClientError(res.statusCode)) {
-      throw `Got client error: ${res.statusCode}`
+      throw `Got client error: ${res.statusCode}`;
     }
     if (isServerError(res.statusCode)) {
-      throw `Got server error: ${res.statusCode}`
+      throw `Got server error: ${res.statusCode}`;
     }
   });
-}).on('error', (err) => { throw `Couldn't send request.` });
+}).on('error', (err) => {
+  throw `Couldn't send request.`;
+});
 ```
 
 Check the program:
@@ -136,209 +140,132 @@ Time to move to Rust.
 
 ## Rust
 
-As said earlier we'll use a 3rd party lib called [`hyper`](http://hyper.rs/) for our Rust example. It is the _de facto_ standard for working with HTTP in Rust. Currently `hyper` only offers a synchronous API - something which Node doesn't even support, so both examples will work slightly different. However an asynchronous API is [in the work](https://github.com/hyperium/hyper/pull/778) and I'll update this example as soon as it becomes stable.
+As I said earlier we'll use a 3rd party lib called [`hyper`](http://hyper.rs/) for our Rust example. It is the _de facto_ standard for working with HTTP(S) in Rust. But I have to tell you something about asynchronous APIs (like doing network requests) in Rust.
 
-To use `hyper` we need to append this section to our `Cargo.toml`.
+As you may know JavaScript is a single-threaded lanugage and all asynchronous APIs are driven by [an event loop](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop). You probably also know about [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises) which allow us to model asynchronous control flow and that the `async`/`await` syntax for functions are build on top of Promises. (Disclaimer: There are more ways to handle asynchronity than by using Promises. In our own chapter from above we used callbacks for example.) You may also recall that it took a while until Promises and `async`/`await` were fully standardized and landed natively in JavaScript.
+
+Rust is basically in the same progress. There will be an `async` keyword and an `await!` macro which will behave similar to JavaScripts `async`/`await`. There is also a concept similar to Promises which is called [Futures](https://github.com/rust-lang-nursery/futures-rs), but they aren't fully standardized yet. You can follow the whole progress on [_"Are we `async` yet?"_](https://areweasyncyet.rs/). But there are also key differences to JavaScript: Rust is multi-threaded and has no build-in event loop.
+
+So everything you'll now see can and will probably change in the future. Take it with a grain of salt.
+
+To use `hyper` we need to append this section to our `Cargo.toml`. This will also add [`hyper-tls`](https://github.com/hyperium/hyper-tls) which we need for HTTPS. It looks like this was kept modular to allow different resolution strategies to get certificates.
 
 ```toml
 [dependencies]
-hyper = "0.9.0"
+hyper = "0.12.21"
+hyper-tls = "0.3.1"
 ```
 
-To check if you can use `hyper` you can create a `src/main.rs` containing nothing but `fn main() {}` and calling `$ cargo run`.
-
-Do you see an error like this one?:
-
-```
-$ cargo run
-   Compiling url v1.1.1
-   Compiling openssl v0.7.14
-   Compiling openssl-sys-extras v0.7.14
-   Compiling solicit v0.4.4
-Build failed, waiting for other jobs to finish...
-error: failed to run custom build command for `openssl v0.7.14`
-Process didn't exit successfully: `/Users/donaldpipowitch/Workspace/rust-for-node-developers/http-requests/rust/target/debug/build/openssl-2fa77a207dd9f358/build-script-build` (exit code: 101)
---- stdout
-TARGET = Some("x86_64-apple-darwin")
-OPT_LEVEL = Some("0")
-PROFILE = Some("debug")
-TARGET = Some("x86_64-apple-darwin")
-debug=true opt-level=0
-HOST = Some("x86_64-apple-darwin")
-TARGET = Some("x86_64-apple-darwin")
-TARGET = Some("x86_64-apple-darwin")
-HOST = Some("x86_64-apple-darwin")
-CC_x86_64-apple-darwin = None
-CC_x86_64_apple_darwin = None
-HOST_CC = None
-CC = None
-HOST = Some("x86_64-apple-darwin")
-TARGET = Some("x86_64-apple-darwin")
-HOST = Some("x86_64-apple-darwin")
-CFLAGS_x86_64-apple-darwin = None
-CFLAGS_x86_64_apple_darwin = None
-HOST_CFLAGS = None
-CFLAGS = None
-running: "cc" "-O0" "-ffunction-sections" "-fdata-sections" "-g" "-m64" "-fPIC" "-o" "/Users/donaldpipowitch/Workspace/rust-for-node-developers/http-requests/rust/target/debug/build/openssl-2fa77a207dd9f358/out/src/c_helpers.o" "-c" "src/c_helpers.c"
-ExitStatus(ExitStatus(256))
-
-
-command did not execute successfully, got: exit code: 1
-
-
-
---- stderr
-src/c_helpers.c:1:10: fatal error: 'openssl/ssl.h' file not found
-#include <openssl/ssl.h>
-         ^
-1 error generated.
-thread '<main>' panicked at 'explicit panic', /Users/donaldpipowitch/.cargo/registry/src/github.com-88ac128001ac3a9a/gcc-0.3.31/src/lib.rs:840
-note: Run with `RUST_BACKTRACE=1` for a backtrace.
-```
-
-If yes, you probably have an error with OpenSSL. Just follow [these steps](https://github.com/sfackler/rust-openssl#building) to solve the error.
-
-On Mac I had to install `openssl` with `brew` like this:
-
-```bash
-brew install openssl
-```
-
-After that I had to add this to my `.bash_profile`:
-
-```
-export OPENSSL_INCLUDE_DIR=`brew --prefix openssl`/include
-export OPENSSL_LIB_DIR=`brew --prefix openssl`/lib
-```
-
-Now you can call `$ cargo clean` and run `$ cargo run` again without any errors.
-
-With this out of the way we can write our Rust example. We'll start exactly like our Node example _without_ setting a user agent.
+Let's start with an high level overview of our file this time:
 
 ```rust
-extern crate hyper;
-
-use std::io::Read;
-use hyper::Client;
+use hyper::rt::{run, Future, Stream};
+use hyper::{Client, Request};
+use hyper_tls::HttpsConnector;
+use std::str::from_utf8;
 
 fn main() {
-    let url = "https://api.github.com/users/donaldpipowitch";
+    run(get());
+}
 
-    let client = Client::new();
-    let mut res = client.get(url).send().expect("Couldn't send request.");
-
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
-    println!("Response: {}", buf);
+fn get() -> impl Future<Item = (), Error = ()> {
+    // more code here
 }
 ```
 
-First we tell the compiler that we want to use an external crate called `hyper`. Than we import `std::io::Read` which you should know from our [_read files exampe_](../read-files/README.md) and we import `hyper::Client` which allows us to make requests.
+`hyper`'s `run` function - as far as I understand - solves a similar problem as our event loop in JavaScript. We can pass a Future to `run`, so it knows when the asynchronous APIs have "finished" its job. Futures are currently bundled in `hyper`. (Think about all the 3rd party Promise libs like [Bluebird](https://github.com/petkaantonov/bluebird) we used - and sometimes still use - in the JavaScript world, before Promises were added to the language.)
 
-In our `main` function we set our `url` containing the protocol, host and path for our request. After that we create a new instance of the [`Client` struct](http://hyper.rs/hyper/0.8.0/hyper/client/struct.Client.html) which we call `client`. `client` has a `get` method which we can pass our `url` into. It will _not_ start the request immediately, but return an instance of the [`RequestBuilder` struct](http://hyper.rs/hyper/v0.9.10/hyper/client/struct.RequestBuilder.html). This one has a `send` method which will start the request. `send` returns `Result<Response>`, so we call `expect` to handle the `Error` case and get an instance of [`Response` struct](http://hyper.rs/hyper/0.8.0/hyper/client/response/struct.Response.html) as the result in the `Ok` case.
+As you can I create a custom function called `get` which returns "something" that `impl`'emented Future. Just like Promises which can resolve or reject our Future can represent a successful (`Item`) or erroneous (`Error`) outcome. But in both cases I'm not really interested in the result, so I'll just return `()`.
 
-After that we read our result into a buffer (`buf`) and print the response body. This should also be familiar from the [_read files exampe_](../read-files/README.md).
+Now we only need to look into our `get` function.
 
-If you run our program now you see the same error as in our first Node example:
+```rust
+fn get() -> impl Future<Item = (), Error = ()> {
+    // 4 is number of blocking DNS threads
+    let https = HttpsConnector::new(4).unwrap();
 
-```
-$ cargo -q run
-Response: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
-```
+    let client = Client::builder().build(https);
 
-Again no error was reported in the case of a `403` response. Let's change that. Thankfully `hyper` can handle status codes easily.
+    let req = Request::get("https://api.github.com/users/donaldpipowitch")
+        .header("User-Agent", "Mercateo/rust-for-node-developers")
+        .body(hyper::Body::empty())
+        .unwrap();
 
-```diff
-extern crate hyper;
-
-use std::io::Read;
-use hyper::Client;
-
-fn main() {
-    let url = "https://api.github.com/users/donaldpipowitch";
-
-    let client = Client::new();
-    let mut res = client.get(url).send().expect("Couldn't send request.");
-
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
-    println!("Response: {}", buf);
-
-+    if res.status.is_client_error() {
-+        panic!("Got client error: {}", res.status);
-+    }
-+    if res.status.is_server_error() {
-+        panic!("Got server error: {}", res.status);
-+    }
+    // more coded here
 }
 ```
 
-Our `Response` struct (`res`) has a field `status` which is a [`StatusCode` enum](http://hyper.rs/hyper/0.8.0/hyper/status/enum.StatusCode.html). In Rust enums can have methods and with `is_client_error` and `is_server_error` we can easily check for the errors we are interested in.
+First we create our `HttpsConnector` which is allows up to 4 blocking DNS threads. (If you don't understand that, it's fine. We don't need to technically understand that part to understand the example in general. The `HttpsConnector` just enables us to make HTTPS requests.) As you can see I used `unwrap()` here instead of our `?` operator. Currently it is not possible out of the box to use `?` inside a function which returns a Future. Sadly I couldn't found an RFC or discussions about this topic and I'd like to see how to handle this case more gracefully.
 
-Note that we use an `if` statement in Rust for the first time. Unlike JavaScript we write it without additional parantheses around the `if` condition. (We _could_ write it that way, but the compiler warns us about unnecessary parentheses.)
+The next thing we create is a `Client` which will make the actual requests. It is uses the [`builder` pattern](https://en.wikipedia.org/wiki/Builder_pattern) which is _really_ popular in the Rust ecosystem in my experience. In this case we just pass our `HttpsConnector` instance to the builder and get a client back.
 
-Test the program again:
+Last but not least we configure our request. It will be a `GET` request (that's why we use `Request::get`), we pass an url, we set the `User-Agent` header and set an empty buddy.
 
-```
-$ cargo -q run
-Response: Request forbidden by administrative rules. Please make sure your request has a User-Agent header (http://developer.github.com/v3/#user-agent-required). Check https://developer.github.com for other possible causes.
+Now we'll need to pass our configured request to the client so it actually executes the request and we can handle the response.
 
-thread '<main>' panicked at 'Got client error: 403 Forbidden', src/main.rs:50
-note: Run with `RUST_BACKTRACE=1` for a backtrace.
-error: Process didn't exit successfully: `target/debug/http-requests` (exit code: 101)
-```
+```rust
+fn get() -> impl Future<Item = (), Error = ()> {
+    // previous code
 
-Great. Our program reports the status code and exits. Again... this is not beautiful, but what we currently want.
+    client
+        .request(req)
+        .and_then(|res| {
+            let status = res.status();
 
-Now let us add the user agent. A quote from the docs:
+            let buf = res.into_body().concat2().wait().unwrap();
+            println!("Response: {}", from_utf8(&buf).unwrap());
 
-> Hyper's header representation is likely the most complex API exposed by Hyper.
+            if status.is_client_error() {
+                panic!("Got client error: {}", status.as_u16());
+            }
+            if status.is_server_error() {
+                panic!("Got server error: {}", status.as_u16());
+            }
 
-The usage of headers is way more specific (but also safer) than Node's way of handling this. Let us look at the final example:
-
-```diff
-extern crate hyper;
-
-use std::io::Read;
-use hyper::Client;
-+use hyper::header::{Headers, UserAgent};
-
-fn main() {
-    let url = "https://api.github.com/users/donaldpipowitch";
-
-+    let mut headers = Headers::new();
-+    headers.set(UserAgent("Mercateo/rust-for-node-developers".to_string()));
-
-    let client = Client::new();
--    let mut res = client.get(url).send().expect("Couldn't send request.");
-+    let mut res = client.get(url)
-+        .headers(headers)
-+        .send()
-+        .expect("Couldn't send request.");
-
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
-    println!("Response: {}", buf);
-
-    if res.status.is_client_error() {
-        panic!("Got client error: {}", res.status);
-    }
-    if res.status.is_server_error() {
-        panic!("Got server error: {}", res.status);
-    }
+            Ok(())
+        })
+        .map_err(|_err| panic!("Couldn't send request."))
 }
 ```
 
-We import `Headers` and `UserAgent` from `hyper::header`. We create a new instance of the [`Headers` struct](http://hyper.rs/hyper/v0.9.10/hyper/header/struct.Headers.html) which we call `headers`. Now we can set different fields to `headers` with the `set` method. This function accepts a [`UserAgent` struct](http://hyper.rs/hyper/v0.9.10/hyper/header/struct.UserAgent.html) among other structs for other fields. We just need to pass `"Mercateo/rust-for-node-developers".to_string()` directly to `UserAgent`.
+The client gets our request _and then_ we handle the response (by using `and_then` which is similar to `then` in a Promise) or handle the error (by using `map_err` which is similar to `catch` in a Promise) if the request couldn't been made at all. In the error case we just `panic!`. We'll do that for all error cases, that's why I just wrote `Error = ()` in the function signature as we don't return a useful error.
 
-The last thing we need to do is passing our `headers` to our actually request with the `headers` method, just before we call `send`. Done!
+If a request could be made we'll get the response (`res`). The response has several useful methods to extract the status (`status()`) and body (`into_body().concat2().wait()`, because the body comes in chunks - similar to our Node example). With `status.is_client_error()` and `status.is_server_error()` we can easily check for 4xx and 5xx error codes. `status.as_u16()` returns the plain status code (e.g. `403`) without the canonical reason (e.g. `Forbidden`). Note that we return `Ok(())` instead of just `()`, [because `()` doesn't implement the Future trait, but `Result` does it](https://stackoverflow.com/questions/46625376/the-trait-bound-futuresfuture-is-not-satisfied-when-using-tcpconnectionn/49331886#49331886).
+
+If you run the program now you should get the same output as we did in the Node example.
 
 ```
 $ cargo -q run
 Response: {"login":"donaldpipowitch","id":1152805, ...
 ```
 
-The Node and the Rust example both show the same result now. Nice. In the next example I'll show you how to actually handle a JSON response.
+This is great, but I actually hid a problem from you. In my original code I had written this:
+
+```diff
+-            let status = res.status();
+-
+-            let buf = res.into_body().concat2().wait().unwrap();
+-            println!("Response: {}", from_utf8(&buf).unwrap());
+
++            let buf = res.into_body().concat2().wait().unwrap();
++            println!("Response: {}", from_utf8(&buf).unwrap());
++
++            let status = res.status();
+```
+
+This made more sense in my opinion as I used the `status` _after_ I used the `buf`. But this throws a compiler error:
+
+```
+26 |             let buf = res.into_body().concat2().wait().unwrap();
+   |                        --- value moved here
+...
+29 |             let status = res.status();
+   |                          ^^^ value borrowed here after move
+```
+
+This error occurs when an attempt is made to use a variable after its contents have been "moved" elsewhere. This is Rusts _ownership_ model which we already mentioned in a [previous chapter](../read-files/README.md) in action. For me it's by far the most complex new concept to understand in Rust. There can only be one "owner" of some content or data at a single point in time. Originally `res` holds the data corresponding to response body, but by calling `res.into_body()` the ownership is transferred and is given to our `buf` variable at the end. After this line no one is allowed to access `res` anymore. It wouldn't be a problem if we could create a _reference_ to the body by calling `res.body()` (similar to `res.status()` which gives us a reference to the status), but I'm not sure if it's possible to get the actual body content as a string from a _referenced_ body.
+
+Nice. In the next example I'll show you how to actually handle a JSON response.
 
 ---
 

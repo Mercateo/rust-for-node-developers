@@ -1,43 +1,49 @@
-#![feature(custom_derive, plugin)]
-#![plugin(serde_macros)]
-
-extern crate hyper;
-extern crate serde_json;
-
-use std::io::Read;
-use hyper::Client;
-use hyper::header::{Headers, UserAgent};
-use serde_json::from_str;
+use hyper::rt::{run, Future, Stream};
+use hyper::{Client, Request};
+use hyper_tls::HttpsConnector;
+use serde::Deserialize;
+use std::str::from_utf8;
 
 #[derive(Deserialize, Debug)]
 struct Repository {
     name: String,
-    description: String,
+    description: Option<String>,
     fork: bool,
 }
 
 fn main() {
-    let url = "https://api.github.com/users/donaldpipowitch/repos";
+    run(get());
+}
 
-    let mut headers = Headers::new();
-    headers.set(UserAgent("Mercateo/rust-for-node-developers".to_string()));
+fn get() -> impl Future<Item = (), Error = ()> {
+    // 4 is number of blocking DNS threads
+    let https = HttpsConnector::new(4).unwrap();
 
-    let client = Client::new();
-    let mut res = client.get(url)
-        .headers(headers)
-        .send()
-        .expect("Couldn't send request.");
+    let client = Client::builder().build(https);
 
-    let mut buf = String::new();
-    res.read_to_string(&mut buf).expect("Couldn't read response.");
+    let req = Request::get("https://api.github.com/users/donaldpipowitch/repos")
+        .header("User-Agent", "Mercateo/rust-for-node-developers")
+        .body(hyper::Body::empty())
+        .unwrap();
 
-    if res.status.is_client_error() {
-        panic!("Got client error: {}", res.status);
-    }
-    if res.status.is_server_error() {
-        panic!("Got server error: {}", res.status);
-    }
+    client
+        .request(req)
+        .and_then(|res| {
+            let status = res.status();
 
-    let repositories: Vec<Repository> = from_str(&buf).expect("Couldn't parse response.");
-    println!("Result is:\n{:?}", repositories);
+            if status.is_client_error() {
+                panic!("Got client error: {}", status.as_u16());
+            }
+            if status.is_server_error() {
+                panic!("Got server error: {}", status.as_u16());
+            }
+
+            let buf = res.into_body().concat2().wait().unwrap();
+            let json = from_utf8(&buf).unwrap();
+            let repositories: Vec<Repository> = serde_json::from_str(&json).unwrap();
+            println!("Result is:\n{:#?}", repositories);
+
+            Ok(())
+        })
+        .map_err(|_err| panic!("Couldn't send request."))
 }

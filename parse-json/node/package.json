@@ -6,12 +6,10 @@
   "typings": "dist/index.d.ts",
   "scripts": {
     "start": "npm run build && node dist",
-    "build": "tsc"
+    "build": "tsc --build src"
   },
   "devDependencies": {
-    "typescript": "^1.8.10"
-  },
-  "dependencies": {
-    "superagent": "^2.1.0"
+    "@types/node": "^10.12.18",
+    "typescript": "^3.2.2"
   }
 }
