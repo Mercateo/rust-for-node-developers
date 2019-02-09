@@ -23,7 +23,7 @@ get({ host, path }, (res) => {
 });
 ```
 
-We import the `get` function from `https`. We declare a `host` and `path` (no need to set the protocol, when we already use the `https` module). After that we call `get` and pass an options object (containing our `host` and `path`) and callback which accepts a response object (`res`) as the _first_ parameter. Yes, `get` doesn't follow the usual callback style pattern of Node where the first param is an error and the second param is a result. It is more low level than that. Instead we have an request object (the return value of `get`) and an response object (`res`) which are both event emitters. We listen for `error` events on the request object and in case of an error we just `throw` `Couldn't send request.` to exit our program.
+We import the `get` function from `https`. We declare a `host` and `path` (no need to set the protocol, when we already use the `https` module). After that we call `get` and pass an options object (containing our `host` and `path`) and callback which accepts a response object (`res`) as the _first_ parameter. Yes, `get` doesn't follow the usual callback style pattern of Node where the first param is an error and the second param is a result. It is more low level than that. Instead we have an request object (the return value of `get`) and a response object (`res`) which are both event emitters. We listen for `error` events on the request object and in case of an error we just `throw` `Couldn't send request.` to exit our program.
 
 We listen for `data` events on the response object and collect every new `chunk` of data in a string called `buf`. In the case of an `end` event on the response object we know we have our whole response body and log `buf`.
 
@@ -144,7 +144,7 @@ As I said earlier we'll use a 3rd party lib called [`hyper`](http://hyper.rs/) f
 
 As you may know JavaScript is a single-threaded lanugage and all asynchronous APIs are driven by [an event loop](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop). You probably also know about [Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises) which allow us to model asynchronous control flow and that the `async`/`await` syntax for functions are build on top of Promises. (Disclaimer: There are more ways to handle asynchronity than by using Promises. In our own chapter from above we used callbacks for example.) You may also recall that it took a while until Promises and `async`/`await` were fully standardized and landed natively in JavaScript.
 
-Rust is basically in the same progress. There will be an `async` keyword and an `await!` macro which will behave similar to JavaScripts `async`/`await`. There is also a concept similar to Promises which is called [Futures](https://github.com/rust-lang-nursery/futures-rs), but they aren't fully standardized yet. You can follow the whole progress on [_"Are we `async` yet?"_](https://areweasyncyet.rs/). But there are also key differences to JavaScript: Rust is multi-threaded and has no build-in event loop.
+Rust is basically in the same progress. There will be an `async` keyword and an `await!` macro which will behave similar to JavaScripts `async`/`await`. There is also a concept similar to Promises which is called [Futures](https://github.com/rust-lang-nursery/futures-rs), but they aren't fully standardized yet. You can follow the whole progress on [_"Are we `async` yet?"_](https://areweasyncyet.rs/). But there are also key differences to JavaScript: Rust is multi-threaded and has no built-in event loop.
 
 So everything you'll now see can and will probably change in the future. Take it with a grain of salt.
 
@@ -195,11 +195,11 @@ fn get() -> impl Future<Item = (), Error = ()> {
 }
 ```
 
-First we create our `HttpsConnector` which is allows up to 4 blocking DNS threads. (If you don't understand that, it's fine. We don't need to technically understand that part to understand the example in general. The `HttpsConnector` just enables us to make HTTPS requests.) As you can see I used `unwrap()` here instead of our `?` operator. Currently it is not possible out of the box to use `?` inside a function which returns a Future. Sadly I couldn't found an RFC or discussions about this topic and I'd like to see how to handle this case more gracefully.
+First we create our `HttpsConnector` which is allows up to 4 blocking DNS threads. (If you don't understand that, it's fine. We don't need to technically understand that part to understand the example in general. The `HttpsConnector` just enables us to make HTTPS requests.) As you can see I used `unwrap()` here instead of our `?` operator. Currently it is not possible out of the box to use `?` inside a function which returns a Future. Sadly I couldn't find an RFC or discussions about this topic and I'd like to see how to handle this case more gracefully.
 
 The next thing we create is a `Client` which will make the actual requests. It is uses the [`builder` pattern](https://en.wikipedia.org/wiki/Builder_pattern) which is _really_ popular in the Rust ecosystem in my experience. In this case we just pass our `HttpsConnector` instance to the builder and get a client back.
 
-Last but not least we configure our request. It will be a `GET` request (that's why we use `Request::get`), we pass an url, we set the `User-Agent` header and set an empty buddy.
+Last but not least we configure our request. It will be a `GET` request (that's why we use `Request::get`), we pass a url, we set the `User-Agent` header and set an empty body.
 
 Now we'll need to pass our configured request to the client so it actually executes the request and we can handle the response.
 
@@ -263,7 +263,7 @@ This made more sense in my opinion as I used the `status` _after_ I used the `bu
    |                          ^^^ value borrowed here after move
 ```
 
-This error occurs when an attempt is made to use a variable after its contents have been "moved" elsewhere. This is Rusts _ownership_ model which we already mentioned in a [previous chapter](../read-files/README.md) in action. For me it's by far the most complex new concept to understand in Rust. There can only be one "owner" of some content or data at a single point in time. Originally `res` holds the data corresponding to response body, but by calling `res.into_body()` the ownership is transferred and is given to our `buf` variable at the end. After this line no one is allowed to access `res` anymore. It wouldn't be a problem if we could create a _reference_ to the body by calling `res.body()` (similar to `res.status()` which gives us a reference to the status), but I'm not sure if it's possible to get the actual body content as a string from a _referenced_ body.
+This error occurs when an attempt is made to use a variable after its contents have been "moved" elsewhere. This is Rust's _ownership_ model which we already mentioned in a [previous chapter](../read-files/README.md) in action. For me it's by far the most complex new concept to understand in Rust. There can only be one "owner" of some content or data at a single point in time. Originally `res` held the data corresponding to response body, but by calling `res.into_body()` the ownership is transferred and is given to our `buf` variable at the end. After this line no one is allowed to access `res` anymore. It wouldn't be a problem if we could create a _reference_ to the body by calling `res.body()` (similar to `res.status()` which gives us a reference to the status), but I'm not sure if it's possible to get the actual body content as a string from a _referenced_ body.
 
 Nice. In the next example I'll show you how to actually handle a JSON response.
 
