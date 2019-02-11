@@ -139,7 +139,7 @@ fn main() {
 }
 ```
 
-As you can see `read_file` accepts a param called `path` which is a `&str` and it will return (`->`) a value from the type `String`. In contract to TypeScript we _always_ need to specify the return type.
+As you can see `read_file` accepts a param called `path` which is a `&str` and it will return (`->`) a value from the type `String`. In contrast to TypeScript we _always_ need to specify the return type.
 
 The remaining code should be relative self-explanatory. Only returning the actual value is new, but it looks just like JavaScript and uses the `return` keyword: `return data;`.
 
@@ -412,7 +412,7 @@ fn main() {
 }
 ```
 
-But... there is also a macro for that! `format!` which makes it more readable in my opinion - espacially if your string would be more complex. You use it like `println!`, but it just returns a `String`.
+But... there is also a macro for that! `format!` which makes it more readable in my opinion - especially if your string would be more complex. You use it like `println!`, but it just returns a `String`.
 
 ```diff
 fn main() {
@@ -462,7 +462,7 @@ fn main() {
 
 ```
 
-We create a new function with `fn` called `write_file`. `write_file` accepts two params `path` and `data` which are both from the type `&str`. It returns a `Result` which is either a `Box<Error>` for the `Err` cass or "empty" (`()`) for the `Ok` case. The file is created with `Fill:create` (this _opens_ a file in write-only mode) which is available, because we added `Write` to `use std::io::{}`. We actually write our content into the file with `write_all` which accepts bytes (`&[u8]`). A `&str` can be converted into a `&[u8]` with the `as_bytes` method. After that we return our "empty" `Ok` case with `Ok(())`.
+We create a new function with `fn` called `write_file`. `write_file` accepts two params `path` and `data` which are both from the type `&str`. It returns a `Result` which is either a `Box<Error>` for the `Err` case or "empty" (`()`) for the `Ok` case. The file is created with `File:create` (this _opens_ a file in write-only mode) which is available, because we added `Write` to `use std::io::{}`. We actually write our content into the file with `write_all` which accepts bytes (`&[u8]`). A `&str` can be converted into a `&[u8]` with the `as_bytes` method. After that we return our "empty" `Ok` case with `Ok(())`.
 
 Let's try our program:
 

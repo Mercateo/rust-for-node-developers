@@ -245,7 +245,7 @@ match file.read(&mut buffer) {
 
 We pass `buffer` to `file.read` with `&mut`. That means that `buffer` is passed to `file.read` as a _mutable reference_ (the `&` marks a reference). This is needed to _allow_ `file.read` to change `buffer`. (It is not enough to flag `buffer` as `mut` in general, we need to allow this to other functions or method in every case, where it is intended.) _Allowing_ this is actually a core feature of Rust called [_ownership_](https://doc.rust-lang.org/book/ch04-00-understanding-ownership.html). `file.read` _borrows_ `buffer` for as long as `file.read` _runs_. If it quits our `main` function becomes the owner of `buffer` again. Doing so ensures that only _one_ function is the owner of a piece of memory at a time and prevents data races. This makes Rust so safe.
 
-`file.read` has no return value which we are interested in, so we do nothing in the `Ok` case: just `Ok(_) => ()`. You can think of this as a [_noop_](https://en.wikipedia.org/wiki/NOP): the `_` in `Ok(_)` is just a placeholder and the last `()` is the so called _unit type_, which is used to mark a meaningless value. (Every function which doesn't return a meaningfull value implicitely returns `()`, just like JavaScript functions return `undefined` by default.)
+`file.read` has no return value which we are interested in, so we do nothing in the `Ok` case: just `Ok(_) => ()`. You can think of this as a [_noop_](https://en.wikipedia.org/wiki/NOP): the `_` in `Ok(_)` is just a placeholder and the last `()` is the so called _unit type_, which is used to mark a meaningless value. (Every function which doesn't return a meaningfull value implicitly returns `()`, just like JavaScript functions return `undefined` by default.)
 
 Now the last snippet:
 
