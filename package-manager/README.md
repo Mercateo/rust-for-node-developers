@@ -2,7 +2,10 @@
 
 ## Meta Data
 
-Node and Rust are both installed together with a package manager. Node's package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). Rust's package manager is called _Cargo_, its packages are called _crates_ and its official website is [crates.io](https://crates.io/).
+Node and Rust are both installed together with a package manager. 
+
+* Node's package manager is called _npm_, its packages are called _node modules_ and its official website is [npmjs.com](https://www.npmjs.com/). 
+* Rust's package manager is called _Cargo_, its packages are called _crates_ and its official website is [crates.io](https://crates.io/).
 
 ![official npm website](./npm-site.png)
 ![official Cargo website](./cargo-site.png)
@@ -169,7 +172,7 @@ version = "0.1.0"
 
 Both files become more interesting if you use dependencies in your project to ensure everyone uses the same dependencies (and dependencies of dependencies) at any time.
 
-Before we move on let us make a slight adjustment to our [`Cargo.toml`](meta-data/rust/Cargo.toml) by adding the line `edition = "2018"`. This will add support for [_Rust 2018_](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html) to our package. _Editions_ are a feature which allow to make backwards incompatible changes in Rust without introducing new major versions. You basically opt-in into new language features per package and your dependencies can be a mix of _different_ editions. Currently there are two different editions available: _Rust 2015_ (which is the default) and _Rust 2018_ (which is the newest).
+Before we move on let us make a slight adjustment to our [`Cargo.toml`](meta-data/rust/Cargo.toml) by adding the line `edition = "2018"`. This will add support for [_Rust 2018_](https://blog.rust-lang.org/2018/12/06/Rust-1.31-and-rust-2018.html) to our package. _Editions_ are a feature which allow us to make backwards incompatible changes in Rust without introducing new major versions. You basically opt-in into new language features per package and your dependencies can be a mix of _different_ editions. Currently there are two different editions available: _Rust 2015_ (which is the default) and _Rust 2018_ (which is the newest).
 
 ## Publishing
 
@@ -227,7 +230,7 @@ export const HELLO_WORLD = 'Hello world!';
 
 We `export` a `const` with the value `'Hello world!'`. This is ES2015 module syntax and we write our exported variable name in `UPPER_CASES` which is a common convention for constants. Call `$ npm run build` to build your project.
 
-This is how our generated `dist/index.js` looks like:
+This is how our generated `dist/index.js` looks:
 
 ```js
 'use strict';
@@ -301,9 +304,14 @@ As you can see this line of code in Rust is really similar to our TypeScript cod
 export const HELLO_WORLD: string = 'Hello world!';
 ```
 
-Let's go throught this word for word.
+Let's go through the Rust line of code word for word:
 
-`pub` makes our variable _public_ - very much like `export` in JavaScript, so it can be used by other packages. `const` in Rust is different than `const` in JavaScript though. In Rust this is a real constant - a value which can't be changed. In JavaScript it is a constant _binding_ which means we can't assign another value to the same name (in this case our variable name is `HELLO_WORLD`). But the value itself can be changed, if it is a non-[primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) value. (E.g. `const a = { b: 1 }; a.b = 2;` is possible.) Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here by adding `&str` or we'll get compiler errors. Rust also supports type infering, but `const` _always_ requires an [explicit type annotation](https://doc.rust-lang.org/rust-by-example/custom_types/constants.html#constants). `&str` is pronounced as _string slice_ (and [as a reminder](../hello-world/README.md) `"Hello world!"` is pronounced as a _string literal_). Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples, but you can already see methods can be invoked in the same way as we do in JavaScript and that built-in types come with a couple of built-in methods (like `'hello'.toUpperCase()` in JavaScript for example).
+* `pub` makes our variable _public_ - very much like `export` in JavaScript, so it can be used by other packages. 
+* `const` in Rust is different than `const` in JavaScript though. In Rust this is a real constant - a value which can't be changed. 
+    * In JavaScript it is a constant _binding_ which means we can't assign another value to the same name (in this case our variable name is `HELLO_WORLD`). But the value itself can be changed, if it is a non-[primitive](https://developer.mozilla.org/en-US/docs/Glossary/Primitive) value. (E.g. `const a = { b: 1 }; a.b = 2;` is possible.) 
+* Unlike TypeScript we _need_ to declare the type of `HELLO_WORLD` here by adding `&str` or we'll get compiler errors. Rust also supports type inferring, but `const` _always_ requires an [explicit type annotation](https://doc.rust-lang.org/rust-by-example/custom_types/constants.html#constants). 
+    * `&str` is pronounced as _string slice_ (and [as a reminder](../hello-world/README.md) `"Hello world!"` is pronounced as a _string literal_). 
+    * Rust actually has another String type called just `String`. A `&str` has a fixed size and cannot be mutated while a `String` is heap-allocated and has a dynamic size. A `&str` can be easily converted to a `String` with the `to_string` method like this: `"Hello world!".to_string();`. We'll see more of that in later examples, but you can already see methods can be invoked in the same way as we do in JavaScript and that built-in types come with a couple of built-in methods (like `'hello'.toUpperCase()` in JavaScript for example).
 
 We only need to publish our new crate now. You need to login on [crates.io/](https://crates.io/) with your GitHub account to do so. If you've done that visit your [account settings](https://crates.io/me) to get your API key. Than call `cargo login` and pass your API key:
 
@@ -443,7 +451,7 @@ fn main() {
 }
 ```
 
-Note that even though our external crate is called `rfnd-hello-world` we access it with `rfnd_hello_world`. Aside from the import we do with the `use` keyword you can see how the string interpolation works with the `println!()` macro where `{}` is a placeholder and we pass the value as the second parameter. (Printing to the terminal can be actually quite complex. Read [this article](https://doc.rust-lang.org/rust-by-example/hello/print.html) to learn more.) In case you didn't know: `console.log()` in Node can behave quite similar. We could rewrite `` console.log(`Required "${HELLO_WORLD}".`); `` to `console.log('Required "%s".', HELLO_WORLD);`. Try it!
+Note that even though our external crate is called `rfnd-hello-world` we access it with `rfnd_hello_world`. Aside from the import we do with the `use` keyword, you can see how the string interpolation works with the `println!()` macro where `{}` is a placeholder and we pass the value as the second parameter. (Printing to the terminal can be actually quite complex. Read [this article](https://doc.rust-lang.org/rust-by-example/hello/print.html) to learn more.) In case you didn't know: `console.log()` in Node can behave quite similar. We could rewrite `` console.log(`Required "${HELLO_WORLD}".`); `` to `console.log('Required "%s".', HELLO_WORLD);`. Try it!
 
 As we use `HELLO_WORLD` just a single time we could also have written the example like this:
 
