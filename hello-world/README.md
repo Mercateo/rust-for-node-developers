@@ -30,10 +30,10 @@ Rust actually needs a special entry point to execute code. This is our `main` fu
 Now compile our code with the following command:
 
 ```bash
-$ rustc hello-word.rs
+$ rustc hello_world.rs
 ```
 
-You'll see... nothing on your console. Instead a new file called `hello-world` was created next to `hello-world.rs`. This file contains our compiled code. You can run it like this:
+You'll see... nothing on your console. Instead a new file called `hello_world` was created next to `hello_world.rs`. This file contains our compiled code. You can run it like this:
 
 ```bash
 $ ./hello-world
