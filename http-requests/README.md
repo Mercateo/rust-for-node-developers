@@ -4,7 +4,7 @@
 
 This time we'll learn how we can send HTTP requests with Node and Rust. To show this we'll just make a `GET` on the GitHub API to get a user. For our Node example we start with our usual TypeScript setup known from the other examples.
 
-Because GitHubs API is served over `https` we'll use Node's `https` module. We could have used a 3rd party lib like [`superagent`](https://github.com/visionmedia/superagent), because for Rust we'll actually use a 3rd party lib called [`hyper`](http://hyper.rs/), but after trying `hyper` I think it is better to just use Node's built-in `https` for comparision, because they are equally low level.
+Because GitHubs API is served over `https` we'll use Node's `https` module. We could have used a 3rd party lib like [`superagent`](https://github.com/visionmedia/superagent), because for Rust we'll actually use a 3rd party lib called [`hyper`](http://hyper.rs/), but after trying `hyper` I think it is better to just use Node's built-in `https` for comparison, because they are equally low level.
 
 So this is our basic example:
 
