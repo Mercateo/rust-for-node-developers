@@ -175,7 +175,7 @@ fn get() -> impl Future<Item = (), Error = ()> {
 
 `hyper`'s `run` function - as far as I understand - solves a similar problem as our event loop in JavaScript. We can pass a Future to `run`, so it knows when the asynchronous APIs have "finished" its job. Futures are currently bundled in `hyper`. (Think about all the 3rd party Promise libs like [Bluebird](https://github.com/petkaantonov/bluebird) we used - and sometimes still use - in the JavaScript world, before Promises were added to the language.)
 
-As you can I create a custom function called `get` which returns "something" that `impl`'emented Future. Just like Promises which can resolve or reject our Future can represent a successful (`Item`) or erroneous (`Error`) outcome. But in both cases I'm not really interested in the result, so I'll just return `()`.
+As you can see I create a custom function called `get` which returns "something" that `impl`'emented Future. Just like Promises which can resolve or reject our Future can represent a successful (`Item`) or erroneous (`Error`) outcome. But in both cases I'm not really interested in the result, so I'll just return `()`.
 
 Now we only need to look into our `get` function.
 
