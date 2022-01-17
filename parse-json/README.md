@@ -110,7 +110,7 @@ fn some_function() {
 
 We can pass additional data to attributes (`#[inline(always)]`) or keys and values (`#[cfg(target_os = "macos")]`).
 
-The attribute we are interested in is called `derive`. It automatically implements certain traits to a custom data structure (in this case a `struct`). The trait we want to derive is called `Deserialize` from the `serde` carte. We'll also derive the build-in `Debug` trait, so we can `println!` our `struct`. A custom `struct` can be created with the `struct` keyword. In our case it has three fields: `name` (which is a `string`), `fork` (which is a `bool`) and `description` (which _maybe_ is a `string`). To express a potentially unavailable value we can use `Option`. `Option` is a little bit like `Result` in the sense that it shows two possible outcomes: `Result` has the successful (`Ok`) and failured (`Err`) cases while `Option` either has _no_ value (the `None` case) or it _has_ a value (the `Some` case).
+The attribute we are interested in is called `derive`. It automatically implements certain traits to a custom data structure (in this case a `struct`). The trait we want to derive is called `Deserialize` from the `serde` crate. We'll also derive the build-in `Debug` trait, so we can `println!` our `struct`. A custom `struct` can be created with the `struct` keyword. In our case it has three fields: `name` (which is a `string`), `fork` (which is a `bool`) and `description` (which _maybe_ is a `string`). To express a potentially unavailable value we can use `Option`. `Option` is a little bit like `Result` in the sense that it shows two possible outcomes: `Result` has the successful (`Ok`) and failured (`Err`) cases while `Option` either has _no_ value (the `None` case) or it _has_ a value (the `Some` case).
 
 Having that said this is how we define our custom `struct` called `Repository`:
 
@@ -149,7 +149,7 @@ fn get() -> impl Future<Item = (), Error = ()> {
 
     let client = Client::builder().build(https);
 
--    let req = Request::get("https://api.github.com/users/donaldpipowitch/repos")
+-    let req = Request::get("https://api.github.com/users/donaldpipowitch")
 +    let req = Request::get("https://api.github.com/users/donaldpipowitch/repos")
         .header("User-Agent", "Mercateo/rust-for-node-developers")
         .body(hyper::Body::empty())
@@ -183,7 +183,7 @@ fn get() -> impl Future<Item = (), Error = ()> {
 
 Two new things can be seen here.
 
-We used the `Vec` type here, because we get multiple `Repository`'s from the response. ([Remember](../read-files/README.md) that we already used the `vec!` macro which created a `Vec`.)
+We used the `Vec` type here, because we get multiple `Repository`'s from the response. ([Remember](../read-files/README.md) that we already used the `vec!` macro in previos chapter, which created a `Vec`.)
 
 The other new thing is the usage of `{:#?}` inside `println!`. So far when we logged a value we used the `println!` macro like this: `println!("Log: {}", some_value);`. To do that `some_value` actually needs to implement the [`Display`](https://doc.rust-lang.org/stable/std/fmt/trait.Display.html) trait. Coming from a JavaScript background you can think of implementing the `Display` trait as providing a nicely formatted `toString` on custom data structures. Sadly `Display` can't be derived automatically. But when all fields in a struct implement `Debug`, we can derive it automatically for custom structs. That's why we use it here. It is an easy way to log custom structs. The usage with `println!` is just a little bit different. You use `{:?}` instead of just `{}`. And if you use `{:#?}` the output will be _pretty printed_. (If you're curious the [string formatting](https://doc.rust-lang.org/std/fmt/index.html) in Rust allows you to do even more cool things, like printing numbers with leading zeros.)
 Let us try our program:
