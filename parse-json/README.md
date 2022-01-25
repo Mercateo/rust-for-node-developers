@@ -183,7 +183,7 @@ fn get() -> impl Future<Item = (), Error = ()> {
 
 Two new things can be seen here.
 
-We used the `Vec` type here, because we get multiple `Repository`'s from the response. ([Remember](../read-files/README.md) that we already used the `vec!` macro in previos chapter, which created a `Vec`.)
+We used the `Vec` type here, because we get multiple `Repository`'s from the response. ([Remember](../read-files/README.md) that we already used the `vec!` macro in a previous chapter, which created a `Vec`.)
 
 The other new thing is the usage of `{:#?}` inside `println!`. So far when we logged a value we used the `println!` macro like this: `println!("Log: {}", some_value);`. To do that `some_value` actually needs to implement the [`Display`](https://doc.rust-lang.org/stable/std/fmt/trait.Display.html) trait. Coming from a JavaScript background you can think of implementing the `Display` trait as providing a nicely formatted `toString` on custom data structures. Sadly `Display` can't be derived automatically. But when all fields in a struct implement `Debug`, we can derive it automatically for custom structs. That's why we use it here. It is an easy way to log custom structs. The usage with `println!` is just a little bit different. You use `{:?}` instead of just `{}`. And if you use `{:#?}` the output will be _pretty printed_. (If you're curious the [string formatting](https://doc.rust-lang.org/std/fmt/index.html) in Rust allows you to do even more cool things, like printing numbers with leading zeros.)
 Let us try our program:
