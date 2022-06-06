@@ -5,5 +5,5 @@ publish = false
 edition = "2018"
 
 [dependencies]
-hyper = "0.12.21"
+hyper = "0.14.10"
 hyper-tls = "0.3.1"
